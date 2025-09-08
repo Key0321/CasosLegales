@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Propagation;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,16 +28,19 @@ import java.util.Optional;
 import java.nio.file.Path;
 
 @Service
+@Transactional
 public class DocumentoServicio {
 
     @Autowired
     private DocumentoRepositorio documentoRepo;
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Page<Documento> listarPaginados(int pagina, int tamaño) {
         Pageable pageable = PageRequest.of(pagina, tamaño);
         return documentoRepo.findAll(pageable);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public boolean eliminarPorId(Long id) {
         if (documentoRepo.existsById(id)) {
             documentoRepo.deleteById(id);
@@ -45,7 +49,7 @@ public class DocumentoServicio {
         return false;
     }
 
-
+    @Transactional(rollbackFor = Exception.class)
     public void eliminarPorId(Long id, Usuario usuario) {
         Optional<Documento> docOpt = documentoRepo.findByIdAndFechaEliminacionIsNull(id);
         if (docOpt.isPresent()) {
@@ -58,34 +62,39 @@ public class DocumentoServicio {
         }
     }
     
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Documento> listarTodos() {
         return documentoRepo.findAll();
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Documento> listarPorProcesoId(Long procesoId) {
         return documentoRepo.findByProcesoIdAndEliminadoPorIsNull(procesoId);
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Optional<Documento> obtenerPorId(Long id) {
         return documentoRepo.findById(id);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Documento guardar(Documento documento) {
         return documentoRepo.save(documento);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void eliminar(Long id) {
         documentoRepo.deleteById(id);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Map<String, List<Documento>> obtenerAgrupadosPorFecha(Long procesoId) {
         List<Documento> documentos = documentoRepo.findByProcesoIdAndEliminadoPorIsNull(procesoId);
         Map<String, List<Documento>> agrupados = new HashMap<>();
 
         LocalDate hoy = LocalDate.now();
         documentos.forEach(doc -> {
-            LocalDate fechaDoc = LocalDate.of(doc.getAnio(), doc.getMes(), 1); // Asume que mes y año definen la fecha
+            LocalDate fechaDoc = LocalDate.of(doc.getAnio(), doc.getMes(), 1);
             String clave = ChronoUnit.DAYS.between(fechaDoc, hoy) <= 0 ? "Hoy" : String.format("%d/%02d", doc.getAnio(), doc.getMes());
             agrupados.computeIfAbsent(clave, k -> new ArrayList<>()).add(doc);
         });
@@ -93,7 +102,8 @@ public class DocumentoServicio {
         return agrupados;
     }
 
-public String guardarArchivo(MultipartFile archivo) throws IOException {
+    @Transactional(rollbackFor = Exception.class)
+    public String guardarArchivo(MultipartFile archivo) throws IOException {
         // Validar archivo
         if (archivo == null || archivo.isEmpty()) {
             throw new IllegalArgumentException("El archivo no puede estar vacío");

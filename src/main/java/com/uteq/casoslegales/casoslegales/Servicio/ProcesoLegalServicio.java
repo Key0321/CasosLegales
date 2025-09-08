@@ -8,8 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,22 +20,24 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@Transactional
 public class ProcesoLegalServicio {
 
     @Autowired
     private ProcesoLegalRepositorio procesoRepo;
 
-
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Page<ProcesoLegal> listarPaginados(int pagina, int tamaño) {
         Pageable pageable = PageRequest.of(pagina, tamaño);
         return procesoRepo.findAll(pageable);
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Object[]> listarProcesoLegalMinimo() {
         return procesoRepo.listarProcesosSoloCampos();
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean eliminarPorId(Long id, Usuario usuario) {
         Optional<ProcesoLegal> procesoOpt = procesoRepo.findByIdAndEliminadoPorIsNull(id);
         if (procesoOpt.isEmpty()) {
@@ -47,18 +50,22 @@ public class ProcesoLegalServicio {
         return true;
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Optional<ProcesoLegal> obtenerPorId(Long id) {
         return procesoRepo.findById(id);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public ProcesoLegal guardar(ProcesoLegal proceso) {
         return procesoRepo.save(proceso);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void eliminar(Long id) {
         procesoRepo.deleteById(id);
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<ProcesoLegal> listarPorUsuario(Long usuarioId) {
         List<ProcesoLegal> procesosPorUsuario = procesoRepo.findProcesosLegalesByUsuarioId(usuarioId);
         List<ProcesoLegal> procesosPorCliente = procesoRepo.findProcesosLegalesByClienteUsuarioId(usuarioId);

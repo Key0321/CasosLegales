@@ -11,12 +11,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 
 import com.uteq.casoslegales.casoslegales.Modelo.Usuario;
 import com.uteq.casoslegales.casoslegales.Repositorio.ProcesoUsuarioRepositorio;
 import com.uteq.casoslegales.casoslegales.Repositorio.UsuarioRepo;
 
 @Service
+@Transactional
 public class UsuarioServicio {
 
     @Autowired
@@ -28,24 +30,27 @@ public class UsuarioServicio {
     @Autowired
     private ProcesoUsuarioRepositorio procesoUsuarioRepositorio;
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Optional<Usuario> autenticar(String correo, String contrasenia) {
-    return usuarioRepo.findByCorreo(correo)
-            .filter(u -> 
-                passwordEncoder.matches(contrasenia, u.getContrasenia()) 
-                || u.getContrasenia().equals(contrasenia)
-            );
-}
+        return usuarioRepo.findByCorreo(correo)
+                .filter(u -> 
+                    passwordEncoder.matches(contrasenia, u.getContrasenia()) 
+                    || u.getContrasenia().equals(contrasenia)
+                );
+    }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Page<Usuario> listarPaginados(int pagina, int tamaño) {
         Pageable pageable = PageRequest.of(pagina, tamaño);
         return usuarioRepo.findAll(pageable);
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Optional<Usuario> buscarPorEmail(String email) {
         return usuarioRepo.findByCorreo(email);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Usuario> listarNoInvolucradosEnProceso(Long procesoId) {
         // Obtener IDs de usuarios involucrados en el proceso
         List<Long> usuariosInvolucradosIds = procesoUsuarioRepositorio
@@ -61,6 +66,7 @@ public class UsuarioServicio {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public boolean eliminarPorId(Long id) {
         if (usuarioRepo.existsById(id)) {
             usuarioRepo.deleteById(id);
@@ -69,23 +75,29 @@ public class UsuarioServicio {
         return false;
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Object[]> listarUsuarioMinimo() {
         return usuarioRepo.listarUsuarioCampos();
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Usuario guardar(Usuario usuario) {
         return usuarioRepo.save(usuario);
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Usuario> listarTodos() {
         return usuarioRepo.findAll();
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Optional<Usuario> buscarPorId(Long id) {
         return usuarioRepo.findById(id);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void eliminar(Long id) {
         usuarioRepo.deleteById(id);
     }
+
 }

@@ -3,6 +3,10 @@ package com.uteq.casoslegales.casoslegales.Servicio;
 import com.uteq.casoslegales.casoslegales.Modelo.Abogado;
 import com.uteq.casoslegales.casoslegales.Modelo.Usuario;
 import com.uteq.casoslegales.casoslegales.Repositorio.AbogadoRepositorio;
+
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,16 +17,19 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class AbogadoServicio {
 
     @Autowired
     private AbogadoRepositorio abogadoRepo;
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Page<Abogado> listarPaginados(int pagina, int tamaño) {
         Pageable pageable = PageRequest.of(pagina, tamaño);
         return abogadoRepo.findAll(pageable);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public boolean eliminarPorId(Long id) {
         if (abogadoRepo.existsById(id)) {
             abogadoRepo.deleteById(id);
@@ -31,24 +38,29 @@ public class AbogadoServicio {
         return false;
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public boolean existePorUsuarioId(Long usuarioId) {
         Usuario usuario = new Usuario();
         usuario.setId(usuarioId);
         return abogadoRepo.existsByUsuario(usuario);
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Abogado> listarTodos() {
         return abogadoRepo.findAll();
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Optional<Abogado> obtenerPorId(Long id) {
         return abogadoRepo.findById(id);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Abogado guardar(Abogado abogado) {
         return abogadoRepo.save(abogado);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void eliminar(Long id) {
         abogadoRepo.deleteById(id);
     }
