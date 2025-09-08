@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mis casos / Nuevo caso</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin/admin_menu.css">
+  <link rel="stylesheet" href="/css/admin/admin_nuevo_pagina.css">
+</head>
+<body>
+  <div class="menu">
+      <div class="menu-logo">
+          <img src="../imagenes/logo.png" alt="Logo" />
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/inicio}'|">
+          <img src="../imagenes/admin_inicio.png" alt="Inicio" />
+          <span>Inicio</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_procesos_legales}'|">
+          <img src="../imagenes/casos.png" alt="Procesos Legales" />
+          <span>Procesos Legales</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_estados}'|">
+          <img src="../imagenes/casos.png" alt="Estados de Procesos" />
+          <span>Estados de Procesos</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_eventos}'|">
+          <img src="../imagenes/casos.png" alt="Audiencias / Eventos" />
+          <span>Audiencias / Eventos</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_documentos}'|">
+          <img src="../imagenes/casos.png" alt="Documentos" />
+          <span>Documentos</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_usuarios}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Usuarios" />
+          <span>Usuarios</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_roles}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Roles" />
+          <span>Roles</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_clientes}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Clientes" />
+          <span>Clientes</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_abogados}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Abogados" />
+          <span>Abogados</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_permisos}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Permisos" />
+          <span>Permisos</span>
+      </div>
+
+      <div class="menu-item activo" th:onclick="|window.location.href='@{/admin/gestion_notificaciones}'|">
+          <img src="../imagenes/admin_comunicacion.png" alt="Notificaciones" />
+          <span>Notificaciones</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_observaciones}'|">
+          <img src="../imagenes/admin_comunicacion.png" alt="Observaciones" />
+          <span>Observaciones</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_chats}'|">
+          <img src="../imagenes/admin_comunicacion.png" alt="Chats" />
+          <span>Chats</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_ajustes}'|">
+          <img src="../imagenes/ajustes.png" alt="Ajustes" />
+          <span>Ajustes</span>
+      </div>
+  </div>
+
+<!-- Contenido principal -->
+<div class="div-contenido">
+    <div class="div-titulo-seccion">
+        <a th:href="@{/admin/gestion_notificaciones}" class="dt-a-link">Notificaciones</a>
+        <span class="dt-sp-separador">/</span>
+        <span class="dt-sp-actual">Nueva</span>
+    </div>
+
+    <!-- Mensajes de alerta -->
+    <div th:if="${error}" class="alert alert-error">
+        <strong>Error:</strong> <span th:text="${error}"></span>
+    </div>
+
+    <div th:if="${exito}" class="alert alert-success">
+        ✅ Notificación creada exitosamente
+    </div>
+
+    <!-- Formulario de creación -->
+    <form class="formulario-caso" th:action="@{/admin/guardar_notificacion}" th:object="${notificacion}" method="post">
+      <div class="form-grupo">
+        <label>Usuario</label>
+        <select th:field="*{usuario.id}" required>
+          <option value="">Seleccione un usuario</option>
+          <option th:each="usuario : ${usuarios}" 
+                  th:value="${usuario[0]}" 
+                  th:text="${usuario[1] + ': ' + usuario[2]}">
+          </option>
+        </select>
+      </div>
+
+      <div class="form-grupo">
+        <label>Proceso</label>
+        <select th:field="*{proceso.id}" required>
+          <option value="">Seleccione un proceso</option>
+          <option th:each="proceso : ${procesos}" 
+                  th:value="${proceso[0]}" 
+                  th:text="${proceso[1] + ': ' + proceso[2]}">
+          </option>
+        </select>
+      </div>
+
+      <div class="form-grupo">
+        <label>Tipo de Notificación</label>
+        <select th:field="*{tipoNotificacion}" required>
+          <option value="">Seleccione un tipo</option>
+          <option value="Recordatorio">Recordatorio</option>
+          <option value="Alerta">Alerta</option>
+          <option value="Actualización">Actualización</option>
+          <option value="Otros">Otros</option>
+        </select>
+      </div>
+
+      <div class="form-grupo">
+        <label>Mensaje</label>
+        <textarea th:field="*{mensaje}" rows="4" required placeholder="Escriba el mensaje..."></textarea>
+      </div>
+
+      <div class="form-grupo">
+        <label>Enviado por Correo</label>
+        <div class="contenedor-interruptor">
+            <label class="interruptor" role="switch" th:attr="aria-checked=${notificacion.enviadoCorreo}" aria-label="Envío por correo">
+                <input type="checkbox" name="enviadoCorreo" id="enviadoCorreoSwitch" th:checked="${notificacion.enviadoCorreo}">
+                <span class="deslizador"></span>
+            </label>
+            <span id="textoEnviadoCorreo" th:text="${notificacion.enviadoCorreo} ? 'Sí' : 'No'">No</span>
+        </div>
+      </div>
+
+      <div class="form-grupo">
+        <button type="submit" class="dt-btn-agregar">Guardar notificación</button>
+      </div>
+    </form>
+</div>
+
+<!-- Script optimizado -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Ocultar alerta automáticamente
+    const successAlert = document.querySelector('.alert-success');
+    successAlert?.style && setTimeout(() => successAlert.style.display = 'none', 5000);
+
+    // Configurar interruptor
+    const switchElement = document.getElementById('enviadoCorreoSwitch');
+    const textElement = document.getElementById('textoEnviadoCorreo');
+    
+    if (switchElement && textElement) {
+        const updateSwitchState = (isChecked) => {
+            textElement.textContent = isChecked ? 'Sí' : 'No';
+            switchElement.parentElement.setAttribute('aria-checked', isChecked);
+        };
+
+        // Estado inicial
+        updateSwitchState(switchElement.checked);
+        
+        // Event listener
+        switchElement.addEventListener('change', () => updateSwitchState(switchElement.checked));
+    }
+});
+</script>
+
+<!-- CSS optimizado -->
+<style>
+.alert { padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid; }
+.alert-error { color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; }
+.alert-success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; }
+.contenedor-interruptor { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+.interruptor { position: relative; display: inline-block; width: 50px; height: 25px; }
+.interruptor input { opacity: 0; width: 0; height: 0; }
+.deslizador { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 25px; }
+.deslizador:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 3.5px; background-color: white; transition: .4s; border-radius: 50%; }
+.interruptor input:checked + .deslizador { background-color: var(--color-primario, #007bff); }
+.interruptor input:checked + .deslizador:before { transform: translateX(24px); }
+#textoEnviadoCorreo { font-weight: 500; color: var(--color-texto, #333); }
+</style>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mis casos / Nuevo caso</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin/admin_menu.css">
+  <link rel="stylesheet" href="/css/admin/admin_nuevo_pagina.css">
+</head>
+<body>
+  <div class="menu">
+      <div class="menu-logo">
+          <img src="../imagenes/logo.png" alt="Logo" />
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/inicio}'|">
+          <img src="../imagenes/admin_inicio.png" alt="Inicio" />
+          <span>Inicio</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_procesos_legales}'|">
+          <img src="../imagenes/casos.png" alt="Procesos Legales" />
+          <span>Procesos Legales</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_estados}'|">
+          <img src="../imagenes/casos.png" alt="Estados de Procesos" />
+          <span>Estados de Procesos</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_eventos}'|">
+          <img src="../imagenes/casos.png" alt="Audiencias / Eventos" />
+          <span>Audiencias / Eventos</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_documentos}'|">
+          <img src="../imagenes/casos.png" alt="Documentos" />
+          <span>Documentos</span>
+      </div>
+
+      <div class="menu-item activo" th:onclick="|window.location.href='@{/admin/gestion_usuarios}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Usuarios" />
+          <span>Usuarios</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_roles}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Roles" />
+          <span>Roles</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_clientes}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Clientes" />
+          <span>Clientes</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_abogados}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Abogados" />
+          <span>Abogados</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_permisos}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Permisos" />
+          <span>Permisos</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_notificaciones}'|">
+          <img src="../imagenes/admin_comunicacion.png" alt="Notificaciones" />
+          <span>Notificaciones</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_observaciones}'|">
+          <img src="../imagenes/admin_comunicacion.png" alt="Observaciones" />
+          <span>Observaciones</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_chats}'|">
+          <img src="../imagenes/admin_comunicacion.png" alt="Chats" />
+          <span>Chats</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_ajustes}'|">
+          <img src="../imagenes/ajustes.png" alt="Ajustes" />
+          <span>Ajustes</span>
+      </div>
+  </div>
+
+    
+
+<!-- Contenido principal -->
+<div class="div-contenido">
+    <div class="div-titulo-seccion">
+        <a th:href="@{/admin/gestion_usuarios}" class="dt-a-link">Usuarios</a>
+        <span class="dt-sp-separador">/</span>
+        <span class="dt-sp-actual">Nuevo</span>
+    </div>
+
+    <!-- Mensajes de alerta -->
+    <div th:if="${error}" class="alert alert-error" style="color: #721c24; background-color: #f8d7da; padding: 12px; border-radius: 8px; border: 1px solid #f5c6cb; margin-bottom: 20px;">
+        <strong>Error:</strong> <span th:text="${error}"></span>
+    </div>
+
+    <div th:if="${exito}" class="alert alert-success" style="color: #155724; background-color: #d4edda; padding: 12px; border-radius: 8px; border: 1px solid #c3e6cb; margin-bottom: 20px;">
+        ✅ Usuario creado exitosamente
+    </div>
+
+    <!-- Formulario de creación -->
+    <form class="formulario-caso" th:action="@{/admin/guardar_usuario}" th:object="${usuario}" method="post" id="usuarioForm">
+
+      <div class="form-grupo">
+        <label>Nombre</label>
+        <input type="text" th:field="*{nombre}" required />
+      </div>
+
+      <div class="form-grupo">
+        <label>Apellido</label>
+        <input type="text" th:field="*{apellido}" required />
+      </div>
+
+    <div class="form-grupo">
+        <label>Tipo de identificación</label>
+        <select id="tipoIdentificacion" th:field="*{tipoIdentificacion}" required>
+            <option value="">Seleccione un tipo</option>
+            <option value="Pasaporte">Pasaporte</option>
+            <option value="Cedula">Cédula de Ciudadanía</option>
+            <option value="RUC">RUC (Registro Único de Contribuyentes)</option>
+        </select>
+    </div>
+
+    <div class="form-grupo">
+        <label>Identificación</label>
+        <input type="text" id="identificacion" th:field="*{identificacion}" required />
+        <small id="identificacionHelp" style="color: gray;"></small>
+    </div>
+
+      <div class="form-grupo">
+        <label>Correo</label>
+        <input type="email" th:field="*{correo}" required />
+      </div>
+
+      <div class="form-grupo">
+        <label>Contraseña</label>
+        <div class="password-container">
+            <input type="password" th:field="*{contrasenia}" id="contraseña" required />
+            <button type="button" class="toggle-password" onclick="togglePassword('contraseña')">
+                👁️
+            </button>
+        </div>
+      </div>
+
+      <div class="form-grupo">
+        <label>Confirmar Contraseña</label>
+        <div class="password-container">
+            <input type="password" id="confirmarContrasenia" name="confirmarContrasenia" required />
+            <button type="button" class="toggle-password" onclick="togglePassword('confirmarContrasenia')">
+                👁️
+            </button>
+        </div>
+        <small id="passwordError" style="color: red; display: none;">Las contraseñas no coinciden</small>
+      </div>
+
+      <div class="form-grupo">
+        <label>Teléfono</label>
+        <input type="text" th:field="*{telefono}" required />
+      </div>
+
+      <div class="form-grupo">
+        <label>Rol</label>
+        <select th:field="*{rol.id}" required>
+          <option value="">Seleccione un rol</option>
+          <option th:each="rol : ${roles}" 
+                  th:value="${rol.id}" 
+                  th:text="${rol.nombre}">
+          </option>
+        </select>
+      </div>
+
+      <div class="form-grupo">
+        <button type="submit" class="dt-btn-agregar">Guardar usuario</button>
+      </div>
+
+    </form>
+</div>
+
+<!-- Script para manejar la contraseña -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ocultar alerta después de 5 segundos
+        const successAlert = document.querySelector('.alert-success');
+        if (successAlert) {
+            setTimeout(function() {
+                successAlert.style.display = 'none';
+            }, 5000);
+        }
+
+        // Validar confirmación de contraseña antes de enviar el formulario
+        document.getElementById('usuarioForm').addEventListener('submit', function(e) {
+            const password = document.getElementById('contrasenia').value;
+            const confirmPassword = document.getElementById('confirmarContrasenia').value;
+            const errorElement = document.getElementById('passwordError');
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                errorElement.style.display = 'block';
+                // Hacer scroll al error
+                errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    });
+
+    function togglePassword(inputId) {
+        const input = document.getElementById(inputId);
+        const button = input.nextElementSibling;
+        
+        if (input.type === 'password') {
+            input.type = 'text';
+            button.textContent = '🔒';
+        } else {
+            input.type = 'password';
+            button.textContent = '👁️';
+        }
+    }
+</script>
+
+<script>
+  const tipoSelect = document.getElementById("tipoIdentificacion");
+  const identificacionInput = document.getElementById("identificacion");
+  const helpText = document.getElementById("identificacionHelp");
+
+  function configurarValidacion() {
+    const tipo = tipoSelect.value;
+    identificacionInput.value = "";
+    identificacionInput.removeAttribute("pattern");
+    identificacionInput.removeAttribute("title");
+
+    if (tipo === "Cedula") {
+      identificacionInput.setAttribute("pattern", "\\d{10}");
+      identificacionInput.setAttribute("title", "La cédula debe tener exactamente 10 dígitos.");
+      helpText.textContent = "Debe ingresar exactamente 10 dígitos.";
+    } else if (tipo === "RUC") {
+      identificacionInput.setAttribute("pattern", "\\d{13}");
+      identificacionInput.setAttribute("title", "El RUC debe tener exactamente 13 dígitos.");
+      helpText.textContent = "Debe ingresar exactamente 13 dígitos.";
+    } else if (tipo === "Pasaporte") {
+      identificacionInput.setAttribute("pattern", "[A-Za-z0-9]{6,15}");
+      identificacionInput.setAttribute("title", "El pasaporte debe tener entre 6 y 15 caracteres alfanuméricos.");
+      helpText.textContent = "Debe ingresar entre 6 y 15 caracteres alfanuméricos.";
+    } else {
+      helpText.textContent = "";
+    }
+  }
+
+  tipoSelect.addEventListener("change", configurarValidacion);
+</script>
+
+<!-- Estilos para el botón de mostrar contraseña -->
+<style>
+    .password-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    
+    .password-container input {
+        padding-right: 40px;
+        width: 100%;
+    }
+    
+    .toggle-password {
+        position: absolute;
+        right: 8px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 4px;
+        background-color: #f0f0f0;
+    }
+    
+    .toggle-password:hover {
+        background-color: #e0e0e0;
+    }
+</style>
+</body>
+</html>

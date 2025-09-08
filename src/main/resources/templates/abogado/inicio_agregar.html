@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mis casos / Nuevo caso</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/abogado/inicio_agregar.css">
+</head>
+<body>
+  <div class="menu">
+      <div class="menu-logo">
+            <img src="../imagenes/logo.png" alt="Inicio" />
+        </div>
+        <div class="menu-item" style="background-color: #D4AF37;">
+            <img src="../imagenes/casos.png" alt="Calendar" />
+        </div>
+        <div class="menu-item">
+            <img src="../imagenes/calendario.png" alt="Calendar" />
+        </div>
+        <div class="menu-item">
+            <img src="../imagenes/documentos.png" alt="Activity" />
+        </div>
+        <div class="menu-item">
+            <img src="../imagenes/reporte.png" alt="Inicio" />
+        </div>
+        <div class="menu-item">
+            <img src="../imagenes/ajustes.png" alt="User" />
+        </div>
+    </div>
+
+    
+
+  <!-- Contenido principal -->
+  <div class="div-contenido">
+    <div class="div-titulo-seccion">
+        <a th:href="@{/abogado/inicio}" class="dt-a-link">Mis casos</a>
+        <span class="dt-sp-separador">/</span>
+        <span class="dt-sp-actual">Nuevo caso</span>
+    </div>
+
+    <!-- Formulario de creación -->
+    <form class="formulario-caso" th:action="@{/abogado/guardar_proceso_legal}" th:object="${procesoLegal}" method="post">
+
+      <div class="form-grupo">
+        <label>Número de proceso</label>
+        <input type="text" th:field="*{numeroProceso}" required />
+      </div>
+
+      <div class="form-grupo">
+        <label>Cliente</label>
+        <select th:field="*{cliente.id}" required>
+          <option value="">Seleccione un cliente</option>
+          <option th:each="cliente : ${clientes}" 
+                  th:value="${cliente.id}" 
+                  th:text="${cliente.usuario.nombre + ' ' + cliente.usuario.apellido}">
+          </option>
+        </select>
+      </div>
+
+      <div class="form-grupo">
+        <label>Estado del proceso</label>
+        <select th:field="*{estado.id}" required>
+          <option value="">Seleccione un estado</option>
+          <option th:each="estado : ${estados}" 
+                  th:value="${estado.id}" 
+                  th:text="${estado.nombre}">
+          </option>
+        </select>
+      </div>
+
+      <div class="form-grupo">
+        <label>Tipo de proceso</label>
+        <input type="text" th:field="*{tipoProceso}" required />
+      </div>
+
+      <div class="form-grupo">
+        <label>Descripción</label>
+        <textarea th:field="*{descripcion}" rows="4" placeholder="Describa el proceso..."></textarea>
+      </div>
+
+      <div class="form-grupo">
+        <label>Fecha de inicio</label>
+        <input type="datetime-local" th:field="*{fechaInicio}" required />
+      </div>
+
+      <div class="form-grupo">
+        <label>Abogados responsables</label>
+
+        <!-- Select + Checkbox + Botón -->
+        <div id="agregar-responsable">
+            <select id="select-abogado">
+                <option th:each="usuario : ${usuarios}" th:value="${usuario.id}" th:text="${usuario.nombre + ' ' + usuario.apellido}"></option>
+            </select>
+            <label>
+                <input type="checkbox" id="check-principal" />
+                Principal
+            </label>
+            <button type="button" onclick="agregarAbogado()">Agregar</button>
+        </div>
+
+        <!-- Lista de responsables seleccionados -->
+        <div id="lista-responsables"></div>
+        </div>
+
+      <div class="form-grupo">
+        <button type="submit" class="dt-btn-agregar">Guardar caso</button>
+      </div>
+
+    <script>
+        const abogados = /*[[${usuarios}]]*/ []; // Thymeleaf los pasa como objeto JS
+        const selectOriginal = document.getElementById('select-abogado');
+        const listaResponsables = document.getElementById('lista-responsables');
+
+        const abogadosSeleccionados = new Map();
+
+        function agregarAbogado() {
+            const id = selectOriginal.value;
+            const nombre = selectOriginal.options[selectOriginal.selectedIndex].text;
+            const esPrincipal = document.getElementById('check-principal').checked;
+
+            if (!id || abogadosSeleccionados.has(id)) return;
+
+            abogadosSeleccionados.set(id, esPrincipal);
+
+            // Crear contenedor
+            const div = document.createElement('div');
+            div.classList.add('abogado-item');
+            div.setAttribute('data-id', id);
+
+            // Select bloqueado
+            const select = document.createElement('select');
+            const option = document.createElement('option');
+            option.value = id;
+            option.textContent = nombre;
+            select.appendChild(option);
+            select.disabled = true;
+
+            // Checkbox
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.name = 'principal';
+            checkbox.value = id;
+            checkbox.checked = esPrincipal;
+
+            // Checkbox label
+            const label = document.createElement('label');
+            label.textContent = 'Principal';
+            label.appendChild(checkbox);
+
+            // Hidden input
+            const hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = 'abogadosSeleccionados';
+            hidden.value = id;
+
+            // Botón eliminar
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = 'x';
+            btn.onclick = function () {
+                listaResponsables.removeChild(div);
+                abogadosSeleccionados.delete(id);
+                restaurarOpcion(id, nombre);
+            };
+
+            // Agregar elementos
+            div.appendChild(select);
+            div.appendChild(label);
+            div.appendChild(hidden);
+            div.appendChild(btn);
+
+            listaResponsables.appendChild(div);
+
+            // Remover opción del select principal
+            selectOriginal.remove(selectOriginal.selectedIndex);
+            document.getElementById('check-principal').checked = false;
+        }
+
+        function restaurarOpcion(id, nombre) {
+            const opt = document.createElement('option');
+            opt.value = id;
+            opt.textContent = nombre;
+            selectOriginal.appendChild(opt);
+        }
+    </script>
+
+    <script th:if="${casoCreado}">
+      alert("✅ Nuevo caso creado exitosamente");
+  </script>
+
+    </form>
+  </div>
+</body>
+</html>

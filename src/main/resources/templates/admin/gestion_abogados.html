@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mis casos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin/gestion_usuarios.css">
+</head>
+<body>
+    <div class="menu">
+      <div class="menu-logo">
+          <img src="../imagenes/logo.png" alt="Logo" />
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/inicio}'|">
+          <img src="../imagenes/admin_inicio.png" alt="Inicio" />
+          <span>Inicio</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_procesos_legales}'|">
+          <img src="../imagenes/casos.png" alt="Procesos Legales" />
+          <span>Procesos Legales</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_estados}'|">
+          <img src="../imagenes/casos.png" alt="Estados de Procesos" />
+          <span>Estados de Procesos</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_eventos}'|">
+          <img src="../imagenes/casos.png" alt="Audiencias / Eventos" />
+          <span>Audiencias / Eventos</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_documentos}'|">
+          <img src="../imagenes/casos.png" alt="Documentos" />
+          <span>Documentos</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_usuarios}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Usuarios" />
+          <span>Usuarios</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_roles}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Roles" />
+          <span>Roles</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_clientes}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Clientes" />
+          <span>Clientes</span>
+      </div>
+
+      <div class="menu-item activo" th:onclick="|window.location.href='@{/admin/gestion_abogados}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Abogados" />
+          <span>Abogados</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_permisos}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Permisos" />
+          <span>Permisos</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_notificaciones}'|">
+          <img src="../imagenes/admin_comunicacion.png" alt="Notificaciones" />
+          <span>Notificaciones</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_observaciones}'|">
+          <img src="../imagenes/admin_comunicacion.png" alt="Observaciones" />
+          <span>Observaciones</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_chats}'|">
+          <img src="../imagenes/admin_comunicacion.png" alt="Chats" />
+          <span>Chats</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_ajustes}'|">
+          <img src="../imagenes/ajustes.png" alt="Ajustes" />
+          <span>Ajustes</span>
+      </div>
+  </div>
+
+    <div class="encabezado">
+      <div class="encabezado-buscar">
+        <div class="div-buscar">
+          <div class="div-img-buscar">
+            <img src="https://img.icons8.com/ios-glyphs/20/999999/search--v1.png" class="img-buscar" alt="Buscar" />
+          </div>
+          <div class="div-input-buscar">
+            <input type="text" placeholder="Buscar..." class="input-buscar" />
+          </div>
+        </div>
+      </div>
+      <div class="encabezado-botones">
+        <div class="menu-item item-notificacion">
+            <img src="../imagenes/notificaciones.png" alt="Notificacion" />
+        </div>
+        <div class="menu-item item-perfil">
+            K
+        </div>
+      </div>
+    </div>
+
+    <div class="div-contenido">
+
+      <div class="div-titulo-seccion">
+        <div>
+          <h2 class="h2-titulo-seccion">Gestion de documentos</h2>
+        </div>
+        <div>
+          <button class="dt-btn-agregar" th:onclick="|window.location.href='@{/admin/gestion_abogados_agregar}'|">+ Agregar</button>
+        </div>
+      </div>
+
+    <div class="div-tabla-contenido">
+        <div class="tabla-scroll">
+            <table class="tabla-contenido">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Usuario</th>
+                        <th>Especialidad</th>
+                        <th>Creado Por</th>
+                        <th>Fecha Creación</th>
+                        <th>Modificado Por</th>
+                        <th>Fecha Modificación</th>
+                        <th>Eliminado Por</th>
+                        <th>Fecha Eliminación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="abogado : ${abogados}" th:attr="data-id=${abogado.id}">
+                        <td th:text="${abogado.id}"></td>
+                        <td th:text="${abogado.usuario != null ? abogado.usuario.nombre + ' ' + abogado.usuario.apellido : '—'}"></td>
+                        <td th:text="${abogado.especialidad != null ? abogado.especialidad : '—'}"></td>
+                        <td th:text="${abogado.creadoPor != null ? abogado.creadoPor.nombre + ' ' + abogado.creadoPor.apellido : '—'}"></td>
+                        <td th:text="${abogado.fechaCreacion != null ? #temporals.format(abogado.fechaCreacion, 'yyyy-MM-dd HH:mm') : '—'}"></td>
+                        <td th:text="${abogado.modificadoPor != null ? abogado.modificadoPor.nombre + ' ' + abogado.modificadoPor.apellido : '—'}"></td>
+                        <td th:text="${abogado.fechaModificacion != null ? #temporals.format(abogado.fechaModificacion, 'yyyy-MM-dd HH:mm') : '—'}"></td>
+                        <td th:text="${abogado.eliminadoPor != null ? abogado.eliminadoPor.nombre + ' ' + abogado.eliminadoPor.apellido : '—'}"></td>
+                        <td th:text="${abogado.fechaEliminacion != null ? #temporals.format(abogado.fechaEliminacion, 'yyyy-MM-dd HH:mm') : '—'}"></td>
+                        <td class="acciones">
+                          <button class="btn-editar" title="Editar">
+                              <img src="../imagenes/editar.png" alt="Editar">
+                          </button>
+                          <button class="btn-eliminar" title="Eliminar">
+                              <img src="../imagenes/eliminar.png" alt="Eliminar">
+                          </button>
+                      </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- PAGINACIÓN -->
+    <div class="paginacion" th:if="${totalPaginas > 0}">
+        <a th:if="${paginaActual > 0}"
+        th:href="@{/admin/gestion_abogados(pagina=${paginaActual - 1}, tamano=10)}">&laquo; Anterior</a>
+
+        <span th:each="i : ${#numbers.sequence(0, totalPaginas - 1)}">
+            <a th:href="@{/admin/gestion_abogados(pagina=${i}, tamano=10)}"
+            th:text="${i + 1}"
+            th:classappend="${i == paginaActual} ? 'activo' : ''"></a>
+        </span>
+
+        <a th:if="${paginaActual < totalPaginas - 1}"
+        th:href="@{/admin/gestion_abogados(pagina=${paginaActual + 1}, tamano=10)}">Siguiente &raquo;</a>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".btn-eliminar").forEach(function(button) {
+        button.addEventListener("click", function(event) {
+            event.preventDefault();
+
+            let fila = button.closest("tr");
+            let idAbogado = fila.getAttribute("data-id"); // ID del abogado
+            let usuario = fila.querySelector("td:nth-child(2)").innerText; // Usuario (nombre + apellido)
+            let especialidad = fila.querySelector("td:nth-child(3)").innerText; // Especialidad
+
+            Swal.fire({
+                title: "¿Estás seguro?",
+                html: `
+                    <p>Vas a eliminar el abogado:</p>
+                    <b>ID:</b> ${idAbogado}<br>
+                    <b>Usuario:</b> ${usuario}<br>
+                    <b>Especialidad:</b> ${especialidad}
+                `,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/eliminar_abogado/${idAbogado}`, {
+                        method: "DELETE"
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            Swal.fire("Eliminado", "El registro ha sido eliminado.", "success")
+                                .then(() => location.reload());
+                        } else {
+                            Swal.fire("Error", "No se pudo eliminar el registro.", "error");
+                        }
+                    })
+                    .catch(() => {
+                        Swal.fire("Error", "Hubo un problema de conexión.", "error");
+                    });
+                }
+            });
+        });
+    });
+});
+</script>
+
+    </div>
+  </body>
+</html>

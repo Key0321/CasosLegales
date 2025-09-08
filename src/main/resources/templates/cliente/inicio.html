@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mis casos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/abogado/abogado_menu.css">
+  <link rel="stylesheet" href="/css/abogado/inicio.css">
+</head>
+<body>
+    <div class="menu">
+      <div class="menu-logo">
+          <img th:src="@{/imagenes/logo.png}" alt="Inicio" />
+      </div>
+      <div class="menu-item activo" th:onclick="|window.location.href='@{/abogado/inicio}'|">
+          <img th:src="@{/imagenes/casos.png}" alt="Mis casos" />
+      </div>
+      <div class="menu-item" th:onclick="|window.location.href='@{/abogado/calendario}'|">
+          <img th:src="@{/imagenes/calendario.png}" alt="Calendar" />
+      </div>
+      <div class="menu-item" th:onclick="|window.location.href='@{/abogado/ajustes}'|">
+          <img th:src="@{/imagenes/ajustes.png}" alt="Ajustes" />
+      </div>
+    </div>
+
+    <div class="encabezado">
+      <div class="encabezado-buscar">
+        <div class="div-buscar">
+          <div class="div-img-buscar">
+            <img src="https://img.icons8.com/ios-glyphs/20/999999/search--v1.png" class="img-buscar" alt="Buscar" />
+          </div>
+          <div class="div-input-buscar">
+            <input type="text" placeholder="Buscar..." class="input-buscar" />
+          </div>
+        </div>
+      </div>
+      <div class="encabezado-botones">
+        <div class="menu-item item-notificacion">
+            <img th:src="@{/imagenes/notificaciones.png}" alt="Notificacion" />
+        </div>
+        <div class="menu-item item-perfil">
+            K
+        </div>
+      </div>
+    </div>
+
+    <div class="div-contenido">
+
+      <div class="div-titulo-seccion">
+        <div>
+          <h2 class="h2-titulo-seccion">Mis casos</h2>
+        </div>
+      </div>
+
+      <div class="div-filtros">
+        <button class="filtro activo">Todos 
+          <span class="cantidad activo" th:text="${procesos.size()}"></span>
+        </button>
+        <button class="filtro">En trámite 
+          <span class="cantidad" 
+                th:text="${#lists.size(procesos.?[estado.nombre == 'En trámite'])}"></span>
+        </button>
+        <button class="filtro">Con sentencia 
+          <span class="cantidad" 
+                th:text="${#lists.size(procesos.?[estado.nombre == 'Con sentencia'])}"></span>
+        </button>
+        <button class="filtro">Finalizado 
+          <span class="cantidad" 
+                th:text="${#lists.size(procesos.?[estado.nombre == 'Finalizado'])}"></span>
+        </button>
+        <button class="filtro">Archivado 
+          <span class="cantidad" 
+                th:text="${#lists.size(procesos.?[estado.nombre == 'Archivado'])}"></span>
+        </button>
+      </div>
+
+      <div class="grid-tarjetas">
+        <div class="tarjeta" th:each="proceso : ${procesos}">
+            <a th:href="@{/cliente/proceso_legal_contenido/{id}(id=${proceso.id})}" class="tarjeta-enlace">
+                <div class="icono-tarjeta" th:classappend="' estado-' + ${#strings.toLowerCase(proceso.estado.nombre)}">
+                    <img th:src="@{'/imagenes/' + ${#strings.toLowerCase(proceso.estado.nombre)} + '.png'}"
+                        th:alt="${proceso.estado.nombre}" />
+                </div>
+                <h3 th:text="${proceso.cliente.usuario.nombre + ' ' + proceso.cliente.usuario.apellido}">
+                    Nombre del cliente
+                </h3>
+                <p class="detalle">Inicio: <strong th:text="${#temporals.format(proceso.fechaInicio, 'dd/MM/yyyy')}">Fecha</strong></p>
+                <p class="descripcion-tarjeta" th:text="${proceso.descripcion}">
+                    Descripción del proceso...
+                </p>
+                <div class="footer-tarjeta">
+                    <span>Estado: <strong th:text="${proceso.estado.nombre}">Estado</strong></span>
+                </div>
+            </a>
+        </div>
+    </div>
+    </div>
+  </body>
+</html>

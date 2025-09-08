@@ -1,0 +1,135 @@
+package com.uteq.casoslegales.casoslegales.Servicio;
+
+import com.uteq.casoslegales.casoslegales.Modelo.Documento;
+import com.uteq.casoslegales.casoslegales.Modelo.Usuario;
+import com.uteq.casoslegales.casoslegales.Repositorio.DocumentoRepositorio;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.nio.file.Path;
+
+@Service
+public class DocumentoServicio {
+
+    @Autowired
+    private DocumentoRepositorio documentoRepo;
+
+    public Page<Documento> listarPaginados(int pagina, int tamaño) {
+        Pageable pageable = PageRequest.of(pagina, tamaño);
+        return documentoRepo.findAll(pageable);
+    }
+
+    public boolean eliminarPorId(Long id) {
+        if (documentoRepo.existsById(id)) {
+            documentoRepo.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
+
+    public void eliminarPorId(Long id, Usuario usuario) {
+        Optional<Documento> docOpt = documentoRepo.findByIdAndFechaEliminacionIsNull(id);
+        if (docOpt.isPresent()) {
+            Documento doc = docOpt.get();
+            doc.setEliminadoPor(usuario);
+            doc.setFechaEliminacion(LocalDateTime.now());
+            documentoRepo.save(doc);
+        } else {
+            throw new RuntimeException("Documento no encontrado o ya eliminado");
+        }
+    }
+    
+    public List<Documento> listarTodos() {
+        return documentoRepo.findAll();
+    }
+
+    public List<Documento> listarPorProcesoId(Long procesoId) {
+        return documentoRepo.findByProcesoIdAndEliminadoPorIsNull(procesoId);
+    }
+
+    public Optional<Documento> obtenerPorId(Long id) {
+        return documentoRepo.findById(id);
+    }
+
+    public Documento guardar(Documento documento) {
+        return documentoRepo.save(documento);
+    }
+
+    public void eliminar(Long id) {
+        documentoRepo.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, List<Documento>> obtenerAgrupadosPorFecha(Long procesoId) {
+        List<Documento> documentos = documentoRepo.findByProcesoIdAndEliminadoPorIsNull(procesoId);
+        Map<String, List<Documento>> agrupados = new HashMap<>();
+
+        LocalDate hoy = LocalDate.now();
+        documentos.forEach(doc -> {
+            LocalDate fechaDoc = LocalDate.of(doc.getAnio(), doc.getMes(), 1); // Asume que mes y año definen la fecha
+            String clave = ChronoUnit.DAYS.between(fechaDoc, hoy) <= 0 ? "Hoy" : String.format("%d/%02d", doc.getAnio(), doc.getMes());
+            agrupados.computeIfAbsent(clave, k -> new ArrayList<>()).add(doc);
+        });
+
+        return agrupados;
+    }
+
+public String guardarArchivo(MultipartFile archivo) throws IOException {
+        // Validar archivo
+        if (archivo == null || archivo.isEmpty()) {
+            throw new IllegalArgumentException("El archivo no puede estar vacío");
+        }
+        if (archivo.getOriginalFilename() == null) {
+            throw new IllegalArgumentException("El archivo no tiene un nombre válido");
+        }
+        if (archivo.getOriginalFilename().toLowerCase().endsWith(".ico")) {
+            throw new IllegalArgumentException("Archivos .ico no están permitidos");
+        }
+        if (archivo.getSize() > 10 * 1024 * 1024) { // 10MB
+            throw new IllegalArgumentException("El archivo excede el tamaño máximo permitido (10MB)");
+        }
+
+        // Crear directorio si no existe
+        Path uploadsDir = Paths.get("uploads/documentos");
+        if (!Files.exists(uploadsDir)) {
+            Files.createDirectories(uploadsDir);
+        }
+
+        // Generar nombre único para el archivo
+        String nombreOriginal = StringUtils.cleanPath(archivo.getOriginalFilename());
+        String extension = "";
+        int i = nombreOriginal.lastIndexOf('.');
+        if (i > 0) {
+            extension = nombreOriginal.substring(i);
+            nombreOriginal = nombreOriginal.substring(0, i);
+        }
+        String nombreArchivo = nombreOriginal + "_" + System.currentTimeMillis() + extension;
+
+        // Guardar archivo
+        Path filePath = uploadsDir.resolve(nombreArchivo);
+        Files.copy(archivo.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        // Devolver ruta completa
+        return "/documentos/" + nombreArchivo;
+    }
+
+}

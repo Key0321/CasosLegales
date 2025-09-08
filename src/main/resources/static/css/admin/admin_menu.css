@@ -1,0 +1,77 @@
+:root {
+    --fuente-principal: 'Domine', serif;
+    --fuente-titulo: 'Big Shoulders Stencil', sans-serif;
+    --color-primario: #D4AF37;
+    --color-secundario: #0B1F3A;
+    --color-blanco: #ffffff;
+    --color-fondo: #F6F6FE;
+    --color-texto: #525252;
+    --color-fondo-botones: #F0F0EB;
+  }
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--color-fondo);
+  color: #333;
+}
+.menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 200px; /* Más ancho para texto */
+  background-color: var(--color-secundario);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-top: 10px;
+}
+
+.menu-logo {
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.menu-logo img {
+  max-width: 60%;
+  height: auto;
+  cursor: pointer;
+}
+
+.menu-item {
+  width: 100%;
+  box-sizing: border-box; 
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.menu-item img {
+  width: 15px; 
+  height: 15px;
+  object-fit: contain;
+}
+
+.menu-item span {
+  font-size: 13px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.menu-item:hover {
+  background-color: var(--color-primario);
+}
+
+.menu-item.activo {
+  background-color: #D4AF37; 
+}
+
+.div-contenido {
+  margin-left: 200px;
+  padding: 2rem;
+  background-color: var(--color-fondo);
+}

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mis casos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin/gestion_usuarios.css">
+</head>
+<body>
+    <div class="menu">
+      <div class="menu-logo">
+          <img src="../imagenes/logo.png" alt="Logo" />
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/inicio}'|">
+          <img src="../imagenes/admin_inicio.png" alt="Inicio" />
+          <span>Inicio</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_procesos_legales}'|">
+          <img src="../imagenes/casos.png" alt="Procesos Legales" />
+          <span>Procesos Legales</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_estados}'|">
+          <img src="../imagenes/casos.png" alt="Estados de Procesos" />
+          <span>Estados de Procesos</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_eventos}'|">
+          <img src="../imagenes/casos.png" alt="Audiencias / Eventos" />
+          <span>Audiencias / Eventos</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_documentos}'|">
+          <img src="../imagenes/casos.png" alt="Documentos" />
+          <span>Documentos</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_usuarios}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Usuarios" />
+          <span>Usuarios</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_roles}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Roles" />
+          <span>Roles</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_clientes}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Clientes" />
+          <span>Clientes</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_abogados}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Abogados" />
+          <span>Abogados</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_permisos}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Permisos" />
+          <span>Permisos</span>
+      </div>
+
+      <div class="menu-item activo" th:onclick="|window.location.href='@{/admin/gestion_notificaciones}'|">
+          <img src="../imagenes/admin_comunicacion.png" alt="Notificaciones" />
+          <span>Notificaciones</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_observaciones}'|">
+          <img src="../imagenes/admin_comunicacion.png" alt="Observaciones" />
+          <span>Observaciones</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_chats}'|">
+          <img src="../imagenes/admin_comunicacion.png" alt="Chats" />
+          <span>Chats</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_ajustes}'|">
+          <img src="../imagenes/ajustes.png" alt="Ajustes" />
+          <span>Ajustes</span>
+      </div>
+  </div>
+
+    <div class="encabezado">
+      <div class="encabezado-buscar">
+        <div class="div-buscar">
+          <div class="div-img-buscar">
+            <img src="https://img.icons8.com/ios-glyphs/20/999999/search--v1.png" class="img-buscar" alt="Buscar" />
+          </div>
+          <div class="div-input-buscar">
+            <input type="text" placeholder="Buscar..." class="input-buscar" />
+          </div>
+        </div>
+      </div>
+      <div class="encabezado-botones">
+        <div class="menu-item item-notificacion">
+            <img src="../imagenes/notificaciones.png" alt="Notificacion" />
+        </div>
+        <div class="menu-item item-perfil">
+            K
+        </div>
+      </div>
+    </div>
+
+    <div class="div-contenido">
+
+      <div class="div-titulo-seccion">
+        <div>
+          <h2 class="h2-titulo-seccion">Gestion de notificaciones</h2>
+        </div>
+        <div>
+          <button class="dt-btn-agregar" th:onclick="|window.location.href='@{/admin/gestion_notificaciones_agregar}'|">+ Agregar</button>
+        </div>
+      </div>
+
+    <div class="div-tabla-contenido">
+    <div class="tabla-scroll">
+        <table class="tabla-contenido">
+        <thead>
+            <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Proceso</th>
+            <th>Tipo Notificación</th>
+            <th>Mensaje</th>
+            <th>Fecha Envío</th>
+            <th>Enviado Correo</th>
+            <th>Creado Por</th>
+            <th>Fecha Creación</th>
+            <th>Modificado Por</th>
+            <th>Fecha Modificación</th>
+            <th>Eliminado Por</th>
+            <th>Fecha Eliminación</th>
+            <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="notificacion : ${notificaciones}" th:attr="data-id=${notificacion.id}">
+              <td th:text="${notificacion.id}"></td>
+              <td th:text="${notificacion.usuario != null ? notificacion.usuario.nombre + ' ' + notificacion.usuario.apellido : '—'}"></td>
+              <td th:text="${notificacion.proceso != null ? notificacion.proceso.numeroProceso : '—'}"></td>
+              <td th:text="${notificacion.tipoNotificacion}"></td>
+              <td th:text="${notificacion.mensaje}"></td>
+              <td th:text="${notificacion.fechaEnvio != null ? #temporals.format(notificacion.fechaEnvio, 'yyyy-MM-dd HH:mm') : '—'}"></td>
+              <td th:text="${notificacion.enviadoCorreo ? 'Sí' : 'No'}"></td>
+              <td th:text="${notificacion.creadoPor != null ? notificacion.creadoPor.nombre + ' ' + notificacion.creadoPor.apellido : '—'}"></td>
+              <td th:text="${notificacion.fechaCreacion != null ? #temporals.format(notificacion.fechaCreacion, 'yyyy-MM-dd HH:mm') : '—'}"></td>
+              <td th:text="${notificacion.modificadoPor != null ? notificacion.modificadoPor.nombre + ' ' + notificacion.modificadoPor.apellido : '—'}"></td>
+              <td th:text="${notificacion.fechaModificacion != null ? #temporals.format(notificacion.fechaModificacion, 'yyyy-MM-dd HH:mm') : '—'}"></td>
+              <td th:text="${notificacion.eliminadoPor != null ? notificacion.eliminadoPor.nombre + ' ' + notificacion.eliminadoPor.apellido : '—'}"></td>
+              <td th:text="${notificacion.fechaEliminacion != null ? #temporals.format(notificacion.fechaEliminacion, 'yyyy-MM-dd HH:mm') : '—'}"></td>
+                <td class="acciones">
+                          <button class="btn-editar" title="Editar">
+                              <img src="../imagenes/editar.png" alt="Editar">
+                          </button>
+                          <button class="btn-eliminar" title="Eliminar">
+                              <img src="../imagenes/eliminar.png" alt="Eliminar">
+                          </button>
+                      </td>
+          </tr>
+        </tbody>
+        </table>
+    </div>
+    </div>
+
+    <!-- PAGINACIÓN -->
+    <div class="paginacion" th:if="${totalPaginas > 0}">
+        <a th:if="${paginaActual > 0}"
+        th:href="@{/admin/gestion_notificaciones(pagina=${paginaActual - 1}, tamano=10)}">&laquo; Anterior</a>
+
+        <span th:each="i : ${#numbers.sequence(0, totalPaginas - 1)}">
+            <a th:href="@{/admin/gestion_notificaciones(pagina=${i}, tamano=10)}"
+            th:text="${i + 1}"
+            th:classappend="${i == paginaActual} ? 'activo' : ''"></a>
+        </span>
+
+        <a th:if="${paginaActual < totalPaginas - 1}"
+        th:href="@{/admin/gestion_notificaciones(pagina=${paginaActual + 1}, tamano=10)}">Siguiente &raquo;</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".btn-eliminar").forEach(function(button) {
+        button.addEventListener("click", function(event) {
+            event.preventDefault();
+
+            let fila = button.closest("tr");
+            let idNotificacion = fila.getAttribute("data-id"); // ID de la notificación
+            let usuario = fila.querySelector("td:nth-child(2)").innerText; // Usuario
+            let proceso = fila.querySelector("td:nth-child(3)").innerText; // Proceso
+
+            Swal.fire({
+                title: "¿Estás seguro?",
+                html: `
+                    <p>Vas a eliminar la notificación:</p>
+                    <b>ID:</b> ${idNotificacion}<br>
+                    <b>Usuario:</b> ${usuario}<br>
+                    <b>Proceso:</b> ${proceso}
+                `,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/eliminar_notificacion/${idNotificacion}`, {
+                        method: "DELETE"
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            Swal.fire("Eliminado", "El registro ha sido eliminado.", "success");
+                            // Eliminar la fila de la tabla sin recargar la página
+                            fila.remove();
+                        } else {
+                            Swal.fire("Error", "No se pudo eliminar el registro.", "error");
+                        }
+                    })
+                    .catch(() => {
+                        Swal.fire("Error", "Hubo un problema de conexión.", "error");
+                    });
+                }
+            });
+        });
+    });
+});
+</script>
+
+    </div>
+  </body>
+</html>

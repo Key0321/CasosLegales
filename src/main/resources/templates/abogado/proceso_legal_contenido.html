@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detalle del Caso</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/abogado/abogado_menu.css">
+  <link rel="stylesheet" href="/css/abogado/proceso_legal_contenido.css">
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+</head>
+<body>
+    <div class="menu">
+      <div class="menu-logo">
+          <img th:src="@{/imagenes/logo.png}" alt="Inicio" />
+      </div>
+      <div class="menu-item activo" th:onclick="|window.location.href='@{/abogado/inicio}'|">
+          <img th:src="@{/imagenes/casos.png}" alt="Mis casos" />
+      </div>
+      <div class="menu-item" th:onclick="|window.location.href='@{/abogado/calendario}'|">
+          <img th:src="@{/imagenes/calendario.png}" alt="Calendar" />
+      </div>
+      <div class="menu-item" th:onclick="|window.location.href='@{/abogado/documentos}'|">
+          <img th:src="@{/imagenes/documentos.png}" alt="Documentos" />
+      </div>
+      <div class="menu-item" th:onclick="|window.location.href='@{/abogado/usuarios}'|">
+          <img th:src="@{/imagenes/admin_usuario.png}" alt="Clientes" />
+      </div>
+      <div class="menu-item" th:onclick="|window.location.href='@{/abogado/reportes}'|">
+          <img th:src="@{/imagenes/reporte.png}" alt="Reportes" />
+      </div>
+      <div class="menu-item" th:onclick="|window.location.href='@{/abogado/ajustes}'|">
+          <img th:src="@{/imagenes/ajustes.png}" alt="Ajustes" />
+      </div>
+    </div>
+
+    <div class="encabezado">
+      <div class="encabezado-buscar">
+        <div class="div-buscar">
+          <div class="div-img-buscar">
+            <img src="https://img.icons8.com/ios-glyphs/20/999999/search--v1.png" class="img-buscar" alt="Buscar" />
+          </div>
+          <div class="div-input-buscar">
+            <input type="text" placeholder="Buscar..." class="input-buscar" />
+          </div>
+        </div>
+      </div>
+      <div class="encabezado-botones">
+        <div class="menu-item item-notificacion">
+            <img th:src="@{/imagenes/notificaciones.png}" alt="Notificacion" />
+        </div>
+        <div class="menu-item item-perfil">
+            <span th:text="${usuarioActual.nombre.substring(0, 1)}"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="div-contenido">
+      <div class="contenido-principal">
+        <!-- Sección de Conversación (Izquierda) -->
+        <div class="seccion-conversacion">
+          <div class="cabecera-conversacion">
+            <div class="info-cabecera-conversacion">
+              <h2 th:text="${proceso.numeroProceso}">Número del Caso</h2>
+              <span class="estado-conversacion">Activo ahora</span>
+            </div>
+            <div class="acciones-cabecera">
+              <button class="btn-info" data-seccion="info" aria-label="Información">
+                <i class="fas fa-info-circle"></i>
+              </button>
+              <button class="btn-info" data-seccion="usuarios" aria-label="Usuarios">
+                <i class="fas fa-users"></i>
+              </button>
+              <button class="btn-info" data-seccion="eventos" aria-label="Eventos">
+                <i class="fas fa-calendar-alt"></i>
+              </button>
+              <button class="btn-info" data-seccion="documentos" aria-label="Documentos">
+                <i class="fas fa-folder"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="mensajes-conversacion">
+              <div class="fecha-mensaje">Hoy</div>
+              <div class="mensaje" th:each="mensaje : ${mensajes}" 
+                  th:classappend="${mensaje.emisor.id == usuarioActual.id ? 'mensaje-propio' : 'mensaje-ajeno'}"
+                  th:attr="data-fecha=${mensaje.fechaEnvio},data-id=${mensaje.id}">
+                  <div class="contenido-mensaje">
+                      <div class="superior-mensaje">
+                          <span class="emisor" th:text="${mensaje.emisor.nombre + ' ' + mensaje.emisor.apellido}">Emisor</span>
+                          <span class="hora-mensaje" th:text="${#temporals.format(mensaje.fechaEnvio, 'HH:mm')}">14:30</span>
+                      </div>
+                      <p th:text="${mensaje.contenido}">Contenido del mensaje...</p>
+                  </div>
+              </div>
+          </div>
+          
+          <div class="contenedor-entrada-conversacion">
+            <div class="acciones-conversacion">
+              <button class="btn-accion" title="Adjuntar documento" aria-label="Adjuntar">
+                <i class="fas fa-paperclip"></i>
+                <input type="file" class="input-archivo" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" />
+              </button>
+              <button class="btn-accion" title="Emoji" aria-label="Emoji">
+                <i class="far fa-smile"></i>
+              </button>
+            </div>
+            <input type="text" placeholder="Escribe un mensaje..." class="input-mensaje-conversacion" />
+            <button class="btn-enviar-mensaje" aria-label="Enviar">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sección de Detalles (Derecha) -->
+        <div class="seccion-detalles">
+          <!-- Información del Caso -->
+          <div class="tarjeta-detalle" id="tarjeta-info">
+            <h3 class="titulo-detalle">
+              <i class="fas fa-info-circle"></i>
+              Información
+            </h3>
+            <div class="contenido-detalle">
+              <div class="item-info" onclick="openEditModal('numeroProceso', '${proceso.numeroProceso}')">
+                <span class="etiqueta-info">Número de caso:</span>
+                <span class="valor-info" th:text="${proceso.numeroProceso}">ABC-123</span>
+              </div>
+              <div class="item-info" onclick="openEditModal('descripcion', '${proceso.descripcion}')">
+                <span class="etiqueta-info">Descripción:</span>
+                <span class="valor-info" th:text="${proceso.descripcion ?: 'Sin descripción'}">Descripción del caso...</span>
+              </div>
+              <div class="item-info" onclick="openEditModal('estado', '${proceso.estado.nombre}')">
+                <span class="etiqueta-info">Estado:</span>
+                <span class="valor-info" th:text="${proceso.estado.nombre}">En progreso</span>
+              </div>
+              <div class="item-info" onclick="openEditModal('fechaInicio', '${#temporals.format(proceso.fechaInicio, \'yyyy-MM-dd\')}')">
+                <span class="etiqueta-info">Fecha inicio:</span>
+                <span class="valor-info" th:text="${#temporals.format(proceso.fechaInicio, 'dd/MM/yyyy')}">01/01/2023</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Personas Involucradas -->
+          <div class="tarjeta-detalle" id="tarjeta-usuarios">
+            <h3 class="titulo-detalle">
+              <i class="fas fa-users"></i>
+              Personas Involucradas
+            </h3>
+            <div class="lista-personas">
+              <div class="item-persona" th:each="pu : ${usuariosInvolucrados}">
+                <div class="avatar-persona"
+                     th:attr="data-user-name=${pu.usuario.nombre + ' ' + pu.usuario.apellido}">
+                  <span th:text="${pu.usuario.nombre.substring(0, 1) + pu.usuario.apellido.substring(0, 1)}">US</span>
+                </div>
+                <div class="info-persona">
+                  <span class="nombre-persona" th:text="${pu.usuario.nombre + ' ' + pu.usuario.apellido}">Usuario Nombre</span>
+                  <span class="rol-persona" th:text="${pu.usuario.rol.nombre}">Rol</span>
+                </div>
+                <span th:if="${pu.esResponsablePrincipal}" class="insignia-persona">Principal</span>
+                <button class="btn-eliminar-usuario" th:attr="data-usuario-id=${pu.usuario.id}" title="Eliminar">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+              
+              <!-- Cliente -->
+              <div class="item-persona">
+                <div class="avatar-persona cliente">
+                  <span th:text="${proceso.cliente.usuario.nombre.substring(0, 1) + proceso.cliente.usuario.apellido.substring(0, 1)}">CL</span>
+                </div>
+                <div class="info-persona">
+                  <span class="nombre-persona" th:text="${proceso.cliente.usuario.nombre + ' ' + proceso.cliente.usuario.apellido}">Cliente Nombre</span>
+                  <span class="rol-persona">Cliente</span>
+                </div>
+              </div>
+
+              <!-- Agregar nuevo -->
+              <div class="item-persona agregar-nuevo" onclick="openAddUserModal()">
+                <div class="avatar-persona">
+                  <i class="fas fa-plus"></i>
+                </div>
+                <div class="info-persona">
+                  <span class="nombre-persona">Agregar nuevo</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Eventos -->
+          <div class="tarjeta-detalle" id="tarjeta-eventos">
+            <h3 class="titulo-detalle">
+              <i class="fas fa-calendar-alt"></i>
+              Eventos
+              <button id="crear-evento" class="btn-crear">+ Nuevo Evento</button>
+            </h3>
+            <div class="lista-eventos" id="lista-eventos">
+              <div class="sin-eventos" id="sin-eventos">
+                <i class="fas fa-calendar-day"></i>
+                <p>No hay eventos para mostrar</p>
+              </div>
+              <div id="con-eventos" class="lista-eventos"></div>
+            </div>
+            <button id="ver-eventos-antiguos" class="btn-crear" style="margin-top: 8px; display: none;">Ver eventos antiguos</button>
+            <button id="ver-eventos-actuales" class="btn-crear" style="margin-top: 8px; display: none;">Ver eventos actuales</button>
+          </div>
+
+          <!-- Documentos -->
+          <div class="tarjeta-detalle" id="tarjeta-documentos">
+            <h3 class="titulo-detalle">
+              <i class="fas fa-folder"></i>
+              Documentos
+              <button id="subir-documento" class="btn-crear">+ Nuevo Documento</button>
+            </h3>
+            <div class="acordeon-documentos">
+              <div class="item-acordeon" th:each="grupo : ${documentosAgrupados}">
+                <div class="cabecera-acordeon">
+                  <span th:text="${grupo.key}">2023 - Noviembre</span>
+                  <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="contenido-acordeon">
+                  <div class="item-documento" th:each="doc : ${grupo.value}">
+                    <i class="fas fa-file-pdf"></i>
+                    <div class="info-documento">
+                      <a th:href="@{${doc.rutaArchivo}}" th:text="${doc.nombre}">documento.pdf</a>
+                      <span th:text="${#temporals.format(doc.fechaCreacion, 'dd/MM/yyyy')}">05/11/2023</span>
+                    </div>
+                    <div class="acciones-documento">
+                      <button class="btn-descargar" title="Descargar" aria-label="Descargar">
+                        <i class="fas fa-download"></i>
+                      </button>
+                      <button class="btn-editar-documento" th:attr="data-doc-id=${doc.id}" title="Editar">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="btn-eliminar-documento" th:attr="data-doc-id=${doc.id}" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para editar info proceso -->
+    <div id="modal-edit-info" class="modal">
+      <div class="contenido-modal">
+        <div class="cabecera-modal">
+          <h2>Editar Información</h2>
+          <button class="cerrar-modal" aria-label="Cerrar"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="cuerpo-modal">
+          <form id="form-edit-info" method="post" th:action="@{/abogado/actualizar-proceso/{id}(id=${proceso.id})}">
+            <input type="hidden" id="edit-field" name="field">
+            <div class="form-grupo" id="edit-field-container">
+              <label id="edit-label" for="edit-value"></label>
+              <input type="text" id="edit-value" name="value" required>
+            </div>
+            <div class="modal-acciones">
+              <button type="button" class="btn-cancelar" onclick="closeModal('modal-edit-info')">Cancelar</button>
+              <button type="submit" class="btn-guardar">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para agregar usuario involucrado -->
+    <div id="modal-add-user" class="modal">
+      <div class="contenido-modal">
+        <div class="cabecera-modal">
+          <h2>Agregar Persona Involucrada</h2>
+          <button class="cerrar-modal" aria-label="Cerrar"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="cuerpo-modal">
+          <form id="form-add-user" method="post" th:action="@{/abogado/agregar-usuario-proceso/{id}(id=${proceso.id})}">
+            <div class="form-grupo">
+              <label for="usuario-id">Seleccionar Usuario:</label>
+              <select id="usuario-id" name="usuarioId" required>
+                <option value="">Seleccione un usuario</option>
+                <option th:each="usuario : ${usuariosDisponibles}" 
+                        th:value="${usuario.id}" 
+                        th:text="${usuario.nombre + ' ' + usuario.apellido}"></option>
+              </select>
+            </div>
+            <div class="form-grupo">
+              <label for="es-principal">Responsable Principal:</label>
+              <input type="checkbox" id="es-principal" name="esResponsablePrincipal">
+            </div>
+            <div class="modal-acciones">
+              <button type="button" class="btn-cancelar" onclick="closeModal('modal-add-user')">Cancelar</button>
+              <button type="submit" class="btn-guardar">Agregar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para nuevo evento -->
+    <div id="modal-evento" class="modal">
+      <div class="contenido-modal">
+        <div class="cabecera-modal">
+          <h2 id="titulo-modal-evento">Nuevo Evento</h2>
+          <button class="cerrar-modal" aria-label="Cerrar"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="cuerpo-modal">
+          <form id="form-evento" th:action="@{/abogado/guardar-evento2}" method="post">
+            <input type="hidden" id="evento-id" name="id">
+            <input type="hidden" name="proceso.id" th:value="${proceso.id}">
+            <div class="form-grupo">
+              <label for="evento-tipo">Tipo de Evento:</label>
+              <input type="text" id="evento-tipo" name="tipoEvento" placeholder="Ingrese el tipo de evento" required>
+            </div>
+            <div class="form-grupo">
+              <label for="evento-descripcion">Descripción:</label>
+              <textarea id="evento-descripcion" name="descripcion" placeholder="Ingrese la descripción" rows="3"></textarea>
+            </div>
+            <div class="form-grupo">
+              <label for="evento-fecha">Fecha y hora:</label>
+              <input type="datetime-local" id="evento-fecha" name="fechaEvento" required>
+            </div>
+            <div class="modal-acciones">
+              <button type="button" class="btn-cancelar" id="cancelar-evento">Cancelar</button>
+              <button type="submit" class="btn-guardar">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para subir/editar documento -->
+    <div id="modal-documento" class="modal">
+      <div class="contenido-modal">
+        <div class="cabecera-modal">
+          <h2 id="titulo-modal-documento">Subir Documento</h2>
+          <button class="cerrar-modal" aria-label="Cerrar"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="cuerpo-modal">
+          <form id="form-documento" method="post" enctype="multipart/form-data" th:action="@{/abogado/subir-documento/{id}(id=${proceso.id})}">
+            <input type="hidden" id="doc-id" name="id">
+            <div class="form-grupo">
+              <label for="archivo">Seleccionar Archivo (opcional para editar):</label>
+              <input type="file" id="archivo" name="archivo" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+            </div>
+            <div class="form-grupo">
+              <label for="nombre">Nombre del Documento:</label>
+              <input type="text" id="nombre" name="nombre" placeholder="Ingrese el nombre" required>
+            </div>
+            <div class="form-grupo">
+              <label for="tipo-documento">Tipo de Documento:</label>
+              <select id="tipo-documento" name="tipoDocumento" required>
+                <option value="">Seleccione un tipo</option>
+                <option value="CONTRATO">Contrato</option>
+                <option value="DEMANDA">Demanda</option>
+                <option value="ESCRITURA">Escritura</option>
+                <option value="SENTENCIA">Sentencia</option>
+                <option value="OFICIO">Oficio</option>
+                <option value="INFORME">Informe</option>
+                <option value="OTRO">Otro</option>
+              </select>
+            </div>
+            <div class="modal-acciones">
+              <button type="button" class="btn-cancelar" onclick="closeModal('modal-documento')">Cancelar</button>
+              <button type="submit" class="btn-guardar">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <input type="hidden" id="proceso-id" th:value="${proceso.id}">
+    <input type="hidden" id="id-usuario" th:value="${usuarioActual.id}">
+
+    <script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Script para el acordeón de documentos
+    document.querySelectorAll('.cabecera-acordeon').forEach(header => {
+        header.addEventListener('click', () => {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('i');
+            content.style.display = content.style.display === 'none' ? 'block' : 'none';
+            icon.classList.toggle('fa-chevron-down');
+            icon.classList.toggle('fa-chevron-up');
+        });
+    });
+
+    // Script para el input de archivo en conversación
+    document.querySelectorAll('.input-archivo').forEach(input => {
+        input.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                console.log('Archivo seleccionado:', e.target.files[0].name);
+            }
+        });
+    });
+
+    const colores = ["#D32F2F", "#1976D2", "#388E3C", "#F57C00", "#7B1FA2", "#0288D1", "#C2185B", "#009688", "#FBC02D", "#512DA8"];
+    document.querySelectorAll(".avatar-persona").forEach(avatar => {
+        if (!avatar.classList.contains('agregar-nuevo')) {
+            avatar.style.backgroundColor = colores[Math.floor(Math.random() * colores.length)];
+        }
+    });
+
+    // Alternar visibilidad de secciones
+    document.querySelectorAll('.btn-info').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevenir que se propague al window.click
+            const seccion = btn.dataset.seccion;
+            const tarjeta = document.getElementById(`tarjeta-${seccion}`);
+            if (tarjeta) {
+                tarjeta.style.display = tarjeta.style.display === 'none' ? 'block' : 'none';
+            }
+        });
+    });
+
+    // Obtener el ID del proceso
+    const procesoId = parseInt(document.getElementById('proceso-id').value, 10);
+    let eventosConEstado = [];
+    let documentosConEstado = [];
+    let mostrarTodos = false;
+    recargarEventos();
+    recargarDocumentos();
+
+    // Función para mostrar mensajes
+    function mostrarMensaje(mensaje, tipo) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `mensaje-aviso ${tipo}`;
+        messageDiv.textContent = mensaje;
+        document.body.appendChild(messageDiv);
+        setTimeout(() => messageDiv.remove(), 5000);
+    }
+
+    // FUNCIONES PARA MODALES (definirlas en el scope global)
+    window.openEditModal = function(field, value) {
+        const modal = document.getElementById('modal-edit-info');
+        const container = document.getElementById('edit-field-container');
+        const hiddenField = document.getElementById('edit-field');
+        
+        hiddenField.value = field;
+        
+        // Limpiar y reconstruir el contenido del campo de edición
+        container.innerHTML = '';
+        
+        let labelText = '';
+        let inputType = 'text';
+        let inputValue = value || '';
+        
+        switch(field) {
+            case 'numeroProceso':
+                labelText = 'Número de Caso:';
+                inputType = 'text';
+                break;
+            case 'descripcion':
+                labelText = 'Descripción:';
+                // Para descripción usar textarea
+                container.innerHTML = `
+                    <label for="edit-value">${labelText}</label>
+                    <textarea id="edit-value" name="value" rows="4" required>${inputValue}</textarea>
+                `;
+                break;
+            case 'estado':
+                labelText = 'Estado:';
+                // Para estado usar select con opciones de Thymeleaf
+                container.innerHTML = `
+                    <label for="edit-value">${labelText}</label>
+                    <select id="edit-value" name="value" required>
+                        <option value="">Seleccione un estado</option>
+                        <!-- Las opciones se llenarán dinámicamente -->
+                    </select>
+                `;
+                // Llenar el select con estados disponibles
+                const estadosDisponibles = /*[[${estadosDisponibles}]]*/ [];
+                const select = container.querySelector('#edit-value');
+                estadosDisponibles.forEach(estado => {
+                    const option = document.createElement('option');
+                    option.value = estado.nombre;
+                    option.textContent = estado.nombre;
+                    option.selected = (estado.nombre === value);
+                    select.appendChild(option);
+                });
+                break;
+            case 'fechaInicio':
+                labelText = 'Fecha Inicio:';
+                inputType = 'date';
+                break;
+            default:
+                labelText = 'Editar:';
+        }
+
+        // Si no se construyó un campo especial, usar input normal
+        if (container.innerHTML === '') {
+            container.innerHTML = `
+                <label for="edit-value">${labelText}</label>
+                <input type="${inputType}" id="edit-value" name="value" value="${inputValue}" required>
+            `;
+        }
+        
+        modal.style.display = 'flex';
+    };
+
+    window.openAddUserModal = function() {
+        document.getElementById('modal-add-user').style.display = 'flex';
+    };
+
+    window.closeModal = function(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    };
+
+    // Asignar eventos de clic a los items de información
+    document.querySelectorAll('.item-info').forEach(item => {
+        item.addEventListener('click', function() {
+            const field = this.getAttribute('onclick').match(/'(.*?)'/)[1];
+            const valueElement = this.querySelector('.valor-info');
+            const value = valueElement ? valueElement.textContent.trim() : '';
+            openEditModal(field, value);
+        });
+    });
+
+    // Event listeners para cerrar modales
+    document.querySelectorAll('.cerrar-modal, .btn-cancelar').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const modal = this.closest('.modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        });
+    });
+
+    // Prevenir que los clics dentro del modal cierren el modal
+    document.querySelectorAll('.modal .contenido-modal').forEach(modalContent => {
+        modalContent.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    });
+
+    // Cerrar modal al hacer clic fuera
+    window.addEventListener('click', function(e) {
+        if (e.target.classList.contains('modal')) {
+            e.target.style.display = 'none';
+        }
+    });
+
+    // Recargar eventos
+    function recargarEventos() {
+        fetch(`/abogado/eventos-proceso/${procesoId}`)
+            .then(response => response.json())
+            .then(nuevosEventos => {
+                eventosConEstado = nuevosEventos.map(evento => ({
+                    id: evento.id,
+                    tipoEvento: evento.tipoEvento,
+                    descripcion: evento.descripcion || 'Sin descripción',
+                    fechaEvento: new Date(evento.fechaEvento),
+                    estado: new Date(evento.fechaEvento) < new Date() ? 'terminado' : 'pendiente',
+                    hora: new Date(evento.fechaEvento).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+                }));
+                actualizarListaEventos();
+            })
+            .catch(error => mostrarMensaje('Error al cargar eventos', 'error'));
+    }
+
+    // Actualizar lista de eventos
+    function actualizarListaEventos() {
+        const lista = document.getElementById('con-eventos');
+        const sinEventos = document.getElementById('sin-eventos');
+        const btnAntiguos = document.getElementById('ver-eventos-antiguos');
+        lista.innerHTML = ''; // Limpiar lista
+        sinEventos.style.display = 'none';
+
+        let eventosFiltrados = [...eventosConEstado].sort((a, b) => b.fechaEvento - a.fechaEvento);
+
+        if (!mostrarTodos) {
+            eventosFiltrados = eventosFiltrados.filter(e => e.estado === 'pendiente');
+            btnAntiguos.style.display = eventosConEstado.some(e => e.estado === 'terminado') ? 'block' : 'none';
+        } else {
+            btnAntiguos.style.display = 'none';
+        }
+
+        if (eventosFiltrados.length === 0) {
+            sinEventos.style.display = 'flex';
+            return;
+        }
+
+        eventosFiltrados.forEach(evento => {
+            const eventoDiv = document.createElement('div');
+            eventoDiv.classList.add('item-evento', evento.estado);
+            eventoDiv.innerHTML = `
+                <div class="contenido-evento">
+                    <h4>${evento.tipoEvento}</h4>
+                    <p>${evento.descripcion}</p>
+                    <div class="evento-fecha">
+                        <i class="fas fa-calendar"></i> <span>${evento.fechaEvento.toLocaleDateString('es-ES')}</span>
+                        <i class="fas fa-clock"></i> <span>${evento.hora}</span>
+                    </div>
+                </div>
+                <div class="acciones-evento">
+                    <button class="btn-editar-evento" data-id="${evento.id}"><i class="fas fa-edit"></i></button>
+                    <button class="btn-eliminar-evento" data-id="${evento.id}"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+            lista.appendChild(eventoDiv);
+        });
+    }
+
+    const btnActuales = document.getElementById('ver-eventos-actuales');
+
+    btnActuales.addEventListener('click', () => {
+        mostrarTodos = false;
+        btnActuales.style.display = 'none'
+        actualizarListaEventos();
+    });
+
+    // Event listener for ver-eventos-antiguos
+    document.getElementById('ver-eventos-antiguos').addEventListener('click', () => {
+        mostrarTodos = true;
+        btnActuales.style.display = 'block'
+        actualizarListaEventos();
+    });
+
+    // Event delegation for edit and delete events
+    document.getElementById('lista-eventos').addEventListener('click', (e) => {
+        if (e.target.closest('.btn-editar-evento')) {
+            const id = e.target.closest('.btn-editar-evento').dataset.id;
+            const evento = eventosConEstado.find(e => e.id == id);
+            if (evento) {
+                document.getElementById('titulo-modal-evento').textContent = 'Editar Evento';
+                document.getElementById('evento-id').value = evento.id;
+                document.getElementById('evento-tipo').value = evento.tipoEvento;
+                document.getElementById('evento-descripcion').value = evento.descripcion;
+                document.getElementById('evento-fecha').value = evento.fechaEvento.toISOString().slice(0, 16);
+                document.getElementById('modal-evento').style.display = 'flex';
+            }
+        } else if (e.target.closest('.btn-eliminar-evento')) {
+            const id = e.target.closest('.btn-eliminar-evento').dataset.id;
+            if (confirm('¿Está seguro de eliminar este evento?')) {
+                fetch(`/abogado/eliminar-evento/${id}`, { method: 'DELETE' })
+                    .then(response => {
+                        if (response.ok) {
+                            recargarEventos();
+                            mostrarMensaje('Evento eliminado', 'success');
+                        } else {
+                            mostrarMensaje('Error al eliminar evento', 'error');
+                        }
+                    });
+            }
+        }
+    });
+
+    // Event delegation for delete user
+    document.querySelector('.lista-personas').addEventListener('click', (e) => {
+        if (e.target.closest('.btn-eliminar-usuario')) {
+            const usuarioId = e.target.closest('.btn-eliminar-usuario').dataset.usuarioId;
+            if (confirm('¿Está seguro de eliminar este usuario del proceso?')) {
+                fetch(`/abogado/eliminar-usuario-proceso/${procesoId}/${usuarioId}`, { method: 'DELETE' })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                            mostrarMensaje('Usuario eliminado del proceso', 'success');
+                        } else {
+                            mostrarMensaje('Error al eliminar usuario', 'error');
+                        }
+                    });
+            }
+        }
+    });
+
+    // Recargar documentos
+    function recargarDocumentos() {
+        fetch(`/abogado/documentos-proceso/${procesoId}`)
+            .then(response => response.json())
+            .then(nuevosDocumentos => {
+                documentosConEstado = nuevosDocumentos;
+                // actualizarListaDocumentos(); // Si necesitas actualización dinámica
+            })
+            .catch(error => mostrarMensaje('Error al cargar documentos', 'error'));
+    }
+
+    // Event delegation for edit and delete documents
+    document.querySelector('.acordeon-documentos').addEventListener('click', (e) => {
+        if (e.target.closest('.btn-editar-documento')) {
+            const id = e.target.closest('.btn-editar-documento').dataset.docId;
+            const doc = documentosConEstado.find(d => d.id == id);
+            if (doc) {
+                document.getElementById('titulo-modal-documento').textContent = 'Editar Documento';
+                document.getElementById('form-documento').action = `/abogado/actualizar-documento/${id}`;
+                document.getElementById('doc-id').value = doc.id;
+                document.getElementById('nombre').value = doc.nombre;
+                document.getElementById('tipo-documento').value = doc.tipoDocumento;
+                document.getElementById('archivo').required = false; // Archivo opcional para editar
+                document.getElementById('modal-documento').style.display = 'flex';
+            }
+        } else if (e.target.closest('.btn-eliminar-documento')) {
+            const id = e.target.closest('.btn-eliminar-documento').dataset.docId;
+            if (confirm('¿Está seguro de eliminar este documento?')) {
+                fetch(`/abogado/eliminar-documento/${id}`, { method: 'DELETE' })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                            mostrarMensaje('Documento eliminado', 'success');
+                        } else {
+                            mostrarMensaje('Error al eliminar documento', 'error');
+                        }
+                    });
+            }
+        }
+    });
+
+    // Para setear nombre de documento al seleccionar archivo
+    document.getElementById('archivo').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            document.getElementById('nombre').value = file.name;
+        }
+    });
+
+    // Función para crear evento
+    document.getElementById('crear-evento').addEventListener('click', () => {
+        document.getElementById('titulo-modal-evento').textContent = 'Nuevo Evento';
+        document.getElementById('form-evento').reset();
+        const ahora = new Date();
+        ahora.setHours(ahora.getHours() + 1, 0, 0, 0);
+        document.getElementById('evento-fecha').value = ahora.toISOString().slice(0, 16);
+        document.getElementById('modal-evento').style.display = 'flex';
+    });
+
+    // Función para subir documento
+    document.getElementById('subir-documento').addEventListener('click', () => {
+        document.getElementById('titulo-modal-documento').textContent = 'Subir Documento';
+        document.getElementById('form-documento').action = `/abogado/subir-documento/${procesoId}`;
+        document.getElementById('form-documento').reset();
+        document.getElementById('doc-id').value = '';
+        document.getElementById('archivo').required = true;
+        document.getElementById('modal-documento').style.display = 'flex';
+    });
+
+    // Submit forms con fetch y mostrar mensaje
+    document.querySelectorAll('#form-edit-info, #form-add-user, #form-evento, #form-documento').forEach(form => {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            fetch(form.action, { 
+                method: form.method, 
+                body: formData,
+                headers: { 
+                    'Accept': 'application/json' 
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        if (form.id === 'form-evento') {
+                            recargarEventos();
+                        } else if (form.id === 'form-documento') {
+                            location.reload();
+                        } else {
+                            location.reload();
+                        }
+                        mostrarMensaje('Guardado correctamente', 'success');
+                        form.closest('.modal').style.display = 'none';
+                    } else {
+                        mostrarMensaje('Error al guardar', 'error');
+                    }
+                })
+                .catch(() => mostrarMensaje('Error de conexión', 'error'));
+        });
+    });
+});
+</script>
+
+<script>
+let stompClient = null;
+const procesoId = parseInt(document.getElementById('proceso-id').value, 10);
+const usuarioActualId = parseInt(document.getElementById('id-usuario').value, 10);
+let lastMessageId = 0;
+let pendingMessages = new Set();
+
+function connectWebSocket() {
+    console.log('Intentando conectar WebSocket para proceso:', procesoId);
+    const socket = new SockJS('/ws-chat', null, { timeout: 15000 });
+    stompClient = StompJs.Stomp.over(socket);
+
+    stompClient.connect({}, function(frame) {
+        console.log('Conectado al WebSocket: ' + frame);
+        document.getElementById('connection-status') ? 
+            document.getElementById('connection-status').textContent = 'Conectado' : 
+            console.warn('Elemento connection-status no encontrado');
+        document.getElementById('connection-status') ? 
+            document.getElementById('connection-status').style.color = 'green' : null;
+
+        const topic = '/topic/chat.' + procesoId;
+        console.log('Suscribiendo a:', topic);
+        stompClient.subscribe(topic, function(message) {
+            console.log('Mensaje recibido en ' + topic + ':', message.body);
+            try {
+                const chatMessage = JSON.parse(message.body);
+                mostrarMensaje(chatMessage);
+                if (chatMessage.id && chatMessage.id > lastMessageId) {
+                    lastMessageId = chatMessage.id;
+                }
+            } catch (e) {
+                console.error('Error al parsear mensaje:', e, 'Raw body:', message.body);
+            }
+        }, function(error) {
+            console.error('Error en suscripción a ' + topic + ':', error);
+        });
+
+        const joinMessage = {
+            procesoId: procesoId,
+            tipo: 'CONEXION',
+            emisorId: usuarioActualId,
+            emisorNombre: document.getElementById('id-usuario').dataset.nombre || 'Usuario ' + usuarioActualId
+        };
+        console.log('Enviando mensaje de conexión:', joinMessage);
+        stompClient.send("/app/chat.addUser", {}, JSON.stringify(joinMessage));
+    }, function(error) {
+        console.error('Error de conexión WebSocket:', error);
+        document.getElementById('connection-status') ? 
+            document.getElementById('connection-status').textContent = 'Desconectado - Reintentando...' : 
+            console.warn('Elemento connection-status no encontrado');
+        document.getElementById('connection-status') ? 
+            document.getElementById('connection-status').style.color = 'red' : null;
+        setTimeout(connectWebSocket, 5000);
+    });
+}
+
+function disconnectWebSocket() {
+    if (stompClient && stompClient.connected) {
+        stompClient.disconnect(function() {
+            console.log("Desconectado del WebSocket");
+        });
+    }
+    document.getElementById('connection-status') ? 
+        document.getElementById('connection-status').textContent = 'Desconectado' : 
+        console.warn('Elemento connection-status no encontrado');
+    document.getElementById('connection-status') ? 
+        document.getElementById('connection-status').style.color = 'red' : null;
+}
+
+function sendMessage() {
+    const messageInput = document.querySelector('.input-mensaje-conversacion');
+    const messageContent = messageInput.value.trim();
+
+    if (messageContent && stompClient && stompClient.connected) {
+        const chatMessage = {
+            contenido: messageContent,
+            procesoId: procesoId,
+            tipoContenido: 'TEXTO',
+            emisorId: usuarioActualId,
+            emisorNombre: document.getElementById('id-usuario').dataset.nombre || 'Usuario ' + usuarioActualId,
+            fechaEnvio: new Date().toISOString()
+        };
+        console.log('Enviando mensaje:', chatMessage);
+        
+        const messageKey = `${chatMessage.contenido}|${chatMessage.fechaEnvio}|${chatMessage.emisorId}`;
+        pendingMessages.add(messageKey);
+        
+        mostrarMensaje(chatMessage);
+        
+        stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(chatMessage));
+        messageInput.value = '';
+    } else {
+        console.error('No se puede enviar mensaje. Estado:', {
+            tieneContenido: !!messageContent,
+            stompClient: !!stompClient,
+            conectado: stompClient ? stompClient.connected : false
+        });
+    }
+}
+
+function mostrarMensaje(message) {
+    // Ignorar mensajes de tipo CONEXION o con contenido null/vacío
+    if (message.tipo === 'CONEXION' || !message.contenido || message.contenido.trim() === '') {
+        console.log('Ignorando mensaje:', message);
+        return;
+    }
+
+    const mensajesContainer = document.querySelector('.mensajes-conversacion');
+    if (!mensajesContainer) {
+        console.error('Contenedor .mensajes-conversacion no encontrado');
+        return;
+    }
+
+    // Verificar duplicados
+    const mensajesExistentes = Array.from(mensajesContainer.querySelectorAll('.mensaje'));
+    if (message.id) {
+        const mensajeYaExiste = mensajesExistentes.some(m => m.dataset.id === message.id.toString());
+        if (mensajeYaExiste) {
+            console.log('Mensaje duplicado detectado (ID: ' + message.id + '), no se agrega:', message);
+            return;
+        }
+    } else {
+        const messageKey = `${message.contenido}|${message.fechaEnvio}|${message.emisorId}`;
+        if (pendingMessages.has(messageKey)) {
+            console.log('Mensaje pendiente detectado, no se agrega:', message);
+            pendingMessages.delete(messageKey);
+            return;
+        }
+    }
+
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('mensaje');
+    messageElement.classList.add(message.emisorId === usuarioActualId ? 'mensaje-propio' : 'mensaje-ajeno');
+
+    let horaFormateada = 'Ahora';
+    let fechaMensaje = new Date();
+    if (message.fechaEnvio) {
+        try {
+            fechaMensaje = new Date(message.fechaEnvio);
+            horaFormateada = fechaMensaje.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        } catch (e) {
+            console.error('Error formateando fecha:', e);
+        }
+    }
+
+    const emisorNombre = message.emisorNombre || (message.emisor ? message.emisor.nombre + ' ' + message.emisor.apellido : 'Sistema');
+
+    messageElement.innerHTML = `
+        <div class="contenido-mensaje">
+            <div class="superior-mensaje">
+                <span class="emisor">${emisorNombre}</span>
+                <span class="hora-mensaje">${horaFormateada}</span>
+            </div>
+            <p>${message.contenido}</p>
+        </div>
+    `;
+    messageElement.dataset.fecha = fechaMensaje.toISOString();
+    messageElement.dataset.id = message.id || '';
+
+    let insertado = false;
+    for (let i = 0; i < mensajesExistentes.length; i++) {
+        const existenteFecha = new Date(mensajesExistentes[i].dataset.fecha || '0');
+        if (fechaMensaje < existenteFecha) {
+            mensajesContainer.insertBefore(messageElement, mensajesExistentes[i]);
+            insertado = true;
+            break;
+        }
+    }
+    if (!insertado) {
+        mensajesContainer.appendChild(messageElement);
+    }
+
+    mensajesContainer.scrollTop = mensajesContainer.scrollHeight;
+}
+
+function pollMessages() {
+    console.log('Polling mensajes para proceso:', procesoId, 'desde ID:', lastMessageId);
+    fetch(`/abogado/mensajes-proceso/${procesoId}?ultimoId=${lastMessageId}`)
+        .then(response => response.json())
+        .then(mensajes => {
+            if (mensajes && mensajes.length > 0) {
+                console.log('Mensajes obtenidos por polling:', mensajes);
+                mensajes.forEach(msg => {
+                    if (msg.tipo !== 'CONEXION' && msg.contenido && msg.contenido.trim() !== '') {
+                        mostrarMensaje(msg);
+                        if (msg.id && msg.id > lastMessageId) {
+                            lastMessageId = msg.id;
+                        }
+                    }
+                });
+            }
+        })
+        .catch(error => console.error('Error en polling:', error));
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const mensajesIniciales = document.querySelectorAll('.mensaje');
+    if (mensajesIniciales.length > 0) {
+        const ultimoMensaje = mensajesIniciales[mensajesIniciales.length - 1];
+        lastMessageId = parseInt(ultimoMensaje.dataset.id || 0, 10);
+        console.log('lastMessageId inicializado:', lastMessageId);
+    }
+
+    console.log('Inicializando WebSocket. Proceso ID:', procesoId, 'Usuario ID:', usuarioActualId);
+    setTimeout(connectWebSocket, 1000);
+    setInterval(pollMessages, 10000);
+
+    const btnEnviar = document.querySelector('.btn-enviar-mensaje');
+    if (btnEnviar) {
+        btnEnviar.addEventListener('click', function(e) {
+            e.preventDefault();
+            sendMessage();
+        });
+    }
+
+    const inputMensaje = document.querySelector('.input-mensaje-conversacion');
+    if (inputMensaje) {
+        inputMensaje.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    }
+});
+
+window.addEventListener('beforeunload', disconnectWebSocket);
+</script>
+
+</body>
+</html>

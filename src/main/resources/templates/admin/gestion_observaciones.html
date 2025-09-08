@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mis casos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin/gestion_usuarios.css">
+</head>
+<body>
+    <div class="menu">
+      <div class="menu-logo">
+          <img src="../imagenes/logo.png" alt="Logo" />
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/inicio}'|">
+          <img src="../imagenes/admin_inicio.png" alt="Inicio" />
+          <span>Inicio</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_procesos_legales}'|">
+          <img src="../imagenes/casos.png" alt="Procesos Legales" />
+          <span>Procesos Legales</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_estados}'|">
+          <img src="../imagenes/casos.png" alt="Estados de Procesos" />
+          <span>Estados de Procesos</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_eventos}'|">
+          <img src="../imagenes/casos.png" alt="Audiencias / Eventos" />
+          <span>Audiencias / Eventos</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_documentos}'|">
+          <img src="../imagenes/casos.png" alt="Documentos" />
+          <span>Documentos</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_usuarios}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Usuarios" />
+          <span>Usuarios</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_roles}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Roles" />
+          <span>Roles</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_clientes}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Clientes" />
+          <span>Clientes</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_abogados}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Abogados" />
+          <span>Abogados</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_permisos}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Permisos" />
+          <span>Permisos</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_notificaciones}'|">
+          <img src="../imagenes/admin_comunicacion.png" alt="Notificaciones" />
+          <span>Notificaciones</span>
+      </div>
+
+      <div class="menu-item activo" th:onclick="|window.location.href='@{/admin/gestion_observaciones}'|">
+          <img src="../imagenes/admin_comunicacion.png" alt="Observaciones" />
+          <span>Observaciones</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_chats}'|">
+          <img src="../imagenes/admin_comunicacion.png" alt="Chats" />
+          <span>Chats</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_ajustes}'|">
+          <img src="../imagenes/ajustes.png" alt="Ajustes" />
+          <span>Ajustes</span>
+      </div>
+  </div>
+
+    <div class="encabezado">
+      <div class="encabezado-buscar">
+        <div class="div-buscar">
+          <div class="div-img-buscar">
+            <img src="https://img.icons8.com/ios-glyphs/20/999999/search--v1.png" class="img-buscar" alt="Buscar" />
+          </div>
+          <div class="div-input-buscar">
+            <input type="text" placeholder="Buscar..." class="input-buscar" />
+          </div>
+        </div>
+      </div>
+      <div class="encabezado-botones">
+        <div class="menu-item item-notificacion">
+            <img src="../imagenes/notificaciones.png" alt="Notificacion" />
+        </div>
+        <div class="menu-item item-perfil">
+            K
+        </div>
+      </div>
+    </div>
+
+    <div class="div-contenido">
+
+      <div class="div-titulo-seccion">
+        <div>
+          <h2 class="h2-titulo-seccion">Gestion de notificaciones</h2>
+        </div>
+        <div>
+          <button class="dt-btn-agregar" id="btn-agregar">+ Agregar</button>
+        </div>
+      </div>
+
+        <div class="div-tabla-contenido">
+        <div class="tabla-scroll">
+            <table class="tabla-contenido">
+                <thead>                     
+                    <tr>
+                        <th>ID</th>
+                        <th>Proceso</th>
+                        <th>Comentario</th>
+                        <th>Creado Por</th>
+                        <th>Fecha Creación</th>
+                        <th>Modificado Por</th>
+                        <th>Fecha Modificación</th>
+                        <th>Eliminado Por</th>
+                        <th>Fecha Eliminación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="observacion : ${observaciones}" th:attr="data-id=${observacion.id}">
+                        <td th:text="${observacion.id}"></td>
+                        <td th:text="${observacion.proceso != null ? observacion.proceso.numeroProceso : '—'}"></td>
+                        <td th:text="${observacion.comentario}"></td>
+                        <td th:text="${observacion.creadoPor != null ? observacion.creadoPor.nombre + ' ' + observacion.creadoPor.apellido : '—'}"></td>
+                        <td th:text="${observacion.fechaCreacion != null ? #temporals.format(observacion.fechaCreacion, 'yyyy-MM-dd HH:mm') : '—'}"></td>
+                        <td th:text="${observacion.modificadoPor != null ? observacion.modificadoPor.nombre + ' ' + observacion.modificadoPor.apellido : '—'}"></td>
+                        <td th:text="${observacion.fechaModificacion != null ? #temporals.format(observacion.fechaModificacion, 'yyyy-MM-dd HH:mm') : '—'}"></td>
+                        <td th:text="${observacion.eliminadoPor != null ? observacion.eliminadoPor.nombre + ' ' + observacion.eliminadoPor.apellido : '—'}"></td>
+                        <td th:text="${observacion.fechaEliminacion != null ? #temporals.format(observacion.fechaEliminacion, 'yyyy-MM-dd HH:mm') : '—'}"></td>
+                        <td class="acciones">
+                          <button class="btn-editar" title="Editar">
+                              <img src="../imagenes/editar.png" alt="Editar">
+                          </button>
+                          <button class="btn-eliminar" title="Eliminar">
+                              <img src="../imagenes/eliminar.png" alt="Eliminar">
+                          </button>
+                      </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- PAGINACIÓN -->
+    <div class="paginacion" th:if="${totalPaginas > 0}">
+        <a th:if="${paginaActual > 0}"
+        th:href="@{/admin/gestion_observaciones(pagina=${paginaActual - 1}, tamano=10)}">&laquo; Anterior</a>
+
+        <span th:each="i : ${#numbers.sequence(0, totalPaginas - 1)}">
+            <a th:href="@{/admin/gestion_observaciones(pagina=${i}, tamano=10)}"
+            th:text="${i + 1}"
+            th:classappend="${i == paginaActual} ? 'activo' : ''"></a>
+        </span>
+
+        <a th:if="${paginaActual < totalPaginas - 1}"
+        th:href="@{/admin/gestion_observaciones(pagina=${paginaActual + 1}, tamano=10)}">Siguiente &raquo;</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".btn-eliminar").forEach(function(button) {
+        button.addEventListener("click", function(event) {
+            event.preventDefault();
+
+            let fila = button.closest("tr");
+            let idObservacion = fila.getAttribute("data-id"); // ID de la observación
+            let proceso = fila.querySelector("td:nth-child(2)").innerText; // Proceso
+            let comentario = fila.querySelector("td:nth-child(3)").innerText; // Comentario
+
+            Swal.fire({
+                title: "¿Estás seguro?",
+                html: `
+                    <p>Vas a eliminar la observación:</p>
+                    <b>ID:</b> ${idObservacion}<br>
+                    <b>Proceso:</b> ${proceso}<br>
+                    <b>Comentario:</b> ${comentario}
+                `,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/eliminar_observacion/${idObservacion}`, {
+                        method: "DELETE"
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            Swal.fire("Eliminado", "El registro ha sido eliminado.", "success");
+                            // Eliminar la fila de la tabla sin recargar la página
+                            fila.remove();
+                        } else {
+                            Swal.fire("Error", "No se pudo eliminar el registro.", "error");
+                        }
+                    })
+                    .catch(() => {
+                        Swal.fire("Error", "Hubo un problema de conexión.", "error");
+                    });
+                }
+            });
+        });
+    });
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.22.4"></script>
+<script>
+'use strict';
+
+const CONFIG = {
+    minCaracteres: 1,
+    maxCaracteres: 500,
+    endpoint: "/admin/guardar_observacion", // POST que guarda observaciones
+    endpointProcesos: "/listar_procesos_legales" // GET para obtener los procesos legales
+};
+
+const MENSAJES = {
+    tituloAgregar: "Agregar nueva observación",
+    tituloEditar: "Editar observación",
+    procesoObligatorio: "Debe seleccionar un proceso",
+    comentarioObligatorio: "El comentario es obligatorio",
+    exitoAgregar: "La observación ha sido agregada correctamente",
+    exitoEditar: "La observación ha sido editada correctamente",
+    errorGeneral: "No se pudo guardar la observación",
+    confirmacion: "Guardado"
+};
+
+// Genera el contenido HTML del modal
+async function generarFormulario(observacion = {}) {
+    // Traer los procesos legales desde el backend
+    const resp = await fetch(CONFIG.endpointProcesos);
+    const procesos = await resp.json();
+
+    const procesoId = observacion.proceso ? observacion.proceso.id : '';
+    const comentario = observacion.comentario || '';
+
+    // Crear opciones de select usando el formato [id, numeroProceso, nombreUsuario]
+    const opcionesProcesos = procesos.map(p => 
+        `<option value="${p[0]}" ${p[0] === procesoId ? 'selected' : ''}>${p[1]} - ${p[2]}</option>`
+    ).join('');
+
+    return `
+        <style>
+            .etiqueta-swal { display: block; margin-bottom: 5px; font-weight: bold; color: var(--color-secundario, #333); text-align: left; }
+            .entrada-swal, select { border-radius: 8px; border: 1px solid #ccc; padding: 8px; margin-bottom: 15px; font-size: 14px; width: 100%; box-sizing: border-box; }
+            textarea.entrada-swal { resize: vertical; min-height: 100px; }
+        </style>
+
+        <label class="etiqueta-swal">Proceso:</label>
+        <select id="procesoObservacion" name="proceso.id">
+            <option value="">-- Seleccione un proceso --</option>
+            ${opcionesProcesos}
+        </select>
+
+        <label class="etiqueta-swal">Comentario:</label>
+        <textarea id="comentarioObservacion" class="entrada-swal" name="comentario" maxlength="${CONFIG.maxCaracteres}">${comentario}</textarea>
+    `;
+}
+
+// Extrae datos de una fila de la tabla
+function extraerDatosFila(fila) {
+    const procesoId = fila.querySelector('td:nth-child(2)').dataset.procesoId || '';
+    return {
+        id: fila.dataset.id,
+        proceso: { id: procesoId ? parseInt(procesoId) : '' },
+        comentario: fila.querySelector('td:nth-child(3)').textContent.trim()
+    };
+}
+
+// Envía la observación al servidor
+async function enviarObservacion(observacion) {
+    const formData = new URLSearchParams();
+    if (observacion.id) formData.append("id", observacion.id);
+    formData.append("proceso.id", observacion.proceso.id);
+    formData.append("comentario", observacion.comentario);
+
+    const resp = await fetch(CONFIG.endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formData.toString()
+    });
+
+    if (!resp.ok) {
+        const text = await resp.text();
+        if (text.includes("<")) {
+            throw new Error("El servidor devolvió un error. Verifica los logs o contacta al administrador.");
+        }
+        throw new Error(text || MENSAJES.errorGeneral);
+    }
+    return resp.text();
+}
+
+// Abre modal de agregar/editar
+async function abrirModal(observacion = {}) {
+    const esEdicion = Boolean(observacion.id);
+
+    const html = await generarFormulario(observacion);
+
+    const resultado = await Swal.fire({
+        title: esEdicion ? MENSAJES.tituloEditar : MENSAJES.tituloAgregar,
+        html: html,
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: "Guardar",
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: "var(--color-secundario, #333)",
+        cancelButtonColor: "#888",
+        showLoaderOnConfirm: true,
+        preConfirm: async () => {
+            const procesoId = document.getElementById("procesoObservacion").value;
+            const comentario = document.getElementById("comentarioObservacion").value.trim();
+
+            if (!procesoId) return Swal.showValidationMessage(MENSAJES.procesoObligatorio);
+            if (!comentario) return Swal.showValidationMessage(MENSAJES.comentarioObligatorio);
+
+            try {
+                await enviarObservacion({
+                    id: observacion.id,
+                    proceso: { id: parseInt(procesoId) },
+                    comentario
+                });
+                return true;
+            } catch (err) {
+                Swal.showValidationMessage(`Error: ${err.message}`);
+                return false;
+            }
+        }
+    });
+
+    if (resultado.isConfirmed) {
+        await Swal.fire({
+            title: MENSAJES.confirmacion,
+            text: esEdicion ? MENSAJES.exitoEditar : MENSAJES.exitoAgregar,
+            icon: "success",
+            timer: 2000,
+            showConfirmButton: false
+        });
+        location.reload();
+    }
+}
+
+// Inicializa eventos de agregar y editar
+function inicializarEventos() {
+    const botonAgregar = document.querySelector(".dt-btn-agregar");
+    if (botonAgregar) {
+        // Reemplazar el evento onclick original
+        botonAgregar.removeAttribute("th:onclick");
+        botonAgregar.addEventListener("click", () => abrirModal());
+    }
+
+    document.querySelectorAll(".btn-editar").forEach(boton => {
+        boton.addEventListener("click", e => {
+            const fila = e.target.closest("tr");
+            if (fila) abrirModal(extraerDatosFila(fila));
+        });
+    });
+}
+
+document.addEventListener("DOMContentLoaded", inicializarEventos);
+</script>
+
+    </div>
+  </body>
+</html>

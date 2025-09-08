@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+
+  <!-- Tailwind CSS -->
+
+  <!-- Estilos personalizados -->
+  <link rel="stylesheet" th:href="@{/css/estilo_login.css}" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:wght@100..900&display=swap" rel="stylesheet">
+
+  
+</head>
+<body>
+  <div class="div-fondo">
+    <header id="encabezado">
+      <div class="contenedor-navegacion">
+        <div class="cn-lista-navegacion">
+          <nav>
+            <ul id="lista-navegacion">
+              <li><a href="#inicio">INICIO</a></li>
+              <li><a href="#funciones">FUNCIONES</a></li>
+              <li><img style="height: 50px; width: 50px;" src="/imagenes/tribunal.png"/></li>
+              <li><a href="#nosotros">NOSOTROS</a></li>
+              <li><a href="#contacto">CONTACTO</a></li>
+            </ul>
+          </nav>
+        </div>
+        
+        <div class="div-boton-login">
+          <button href="#login" id="boton-login">LOGIN</button>
+        </div>
+      </div>
+    </header>
+
+   <!-- Inicio -->
+    <section style="margin-top:20px;">
+        <div class="contenedor-2">
+            <div class="contenedor-imagen">
+                <img class="imagen" src="/imagenes/justicia2.png"/>
+            </div>
+
+            <div class="div-login">
+                <div class="dl-contorno">
+                    <div class="dlc-contenido">
+                        <h1>Hola !<br>Bienvenido de nuevo</h1>
+
+                        <form th:action="@{/login}" method="post">
+                          <div class="dlcc-input">
+                              <input type="email" name="correo" placeholder="Ingrese el correo electrónico" />
+                          </div>
+
+                          <div class="dlcc-input">
+                              <input type="password" name="contrasenia" placeholder="••••••••" />
+                          </div>
+
+                          <div th:if="${error}" style="color: red; text-align: center; margin: 10px 0;">
+                            <p th:text="${error}"></p>
+                          </div>
+                        
+                          <div class="dlcc-contraseña">
+                              <a href="#">Olvidastes la contraseña?</a>
+                          </div>
+
+                          <button class="dlcc-boton">Iniciar Sesión</button>
+
+                        </form>
+                    </div>
+            </div>
+            </div>
+        </div>
+    </section>
+  </div>
+  <!-- Header -->
+  
+</body>
+</html>

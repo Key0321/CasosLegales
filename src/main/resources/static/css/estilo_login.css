@@ -1,0 +1,254 @@
+:root {
+    --fuente-principal: 'Domine', serif;
+    --fuente-titulo: 'Big Shoulders Stencil', sans-serif;
+    --color-primario: #D4AF37;
+    --color-secundario: #0B1F3A;
+    --color-fondo: #ffffff;
+    --color-texto: #525252;
+    --color-texto-blanco: #ffffff;
+  }
+
+  html {
+  scroll-behavior: smooth; /*Va a la referencia suavemente*/
+  }
+  
+  body {
+    font-family: var(--fuente-principal);
+    color: var(--color-texto);
+    background-color: var(--color-fondo);
+    margin: 0px;
+    padding: 0;
+  }
+
+  .div-fondo{
+    background-image: url('/imagenes/fondo-login.png'); 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  #encabezado{
+    color: var(--color-fondo);              
+    padding-left: 125px;  
+    padding-right: 125px;  
+    padding-top: 50px;
+    padding-bottom: 25px;
+  }
+
+
+  .contenedor-navegacion{
+    display: flex;
+    align-items: center;
+    position: relative;    
+  }
+
+  .cn-lista-navegacion {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .div-boton-login {
+    margin-left: auto;
+  }
+
+
+
+#lista-navegacion {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* ✅ Estilo para enlaces */
+#lista-navegacion li a {
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-family: var(--fuente-principal);
+  color: var(--color-texto-blanco);
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+/* ✅ Hover de enlaces y botones */
+#lista-navegacion li a:hover {
+  color: var(--color-primario);
+  text-decoration: none;
+}
+
+#lista-navegacion > li{
+    margin: 1rem;
+    
+    @media (min-width: 768px) {
+      margin: 2rem;    
+    }
+
+  }
+
+  #boton-login{
+    padding: 5px 20px;
+    border: 2px solid var(--color-primario);
+    background-color: var(--color-primario);
+    font-family: var(--fuente-principal);
+    color: var(--color-fondo);
+    font-size: 16px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  
+  .di-subtitulo{
+    color: var(--color-texto-blanco); 
+    font-size: 15px;
+  }
+
+  .di-titulo{
+    color: var(--color-primario); 
+    font-weight: bold;
+    font-size: 150px;
+    font-family: var(--fuente-titulo);
+  }
+
+ 
+
+  .contenedor-imagen{
+    display: flex;
+    justify-content: center;   
+    align-items: center;      
+  }
+
+  .contenedor-imagen img {
+    width: 100%;
+    height: auto;
+  }
+
+  
+  .contenedor-2 {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.5rem;
+    
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+.div-login{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dl-contorno {
+  backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  width: 350px;
+  color: white;
+}
+
+.dlc-contenido h1 {
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: 30px;
+  line-height: 1.4;
+}
+
+
+.dlcc-input input {
+  margin-bottom: 20px;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background-color: #f2f6fc;
+  color: #000;
+  font-size: 1rem;
+}
+
+.dlcc-contraseña {
+  text-align: right;
+  margin-bottom: 1.5rem;
+}
+
+.dlcc-contraseña a {
+  font-size: 0.9rem;
+  color: #ccc;
+  text-decoration: none;
+}
+
+.dlcc-boton {
+  width: 100%;
+  border: none;
+  padding: 10px;
+  background-color: var(--color-primario);
+  color: var(--color-fondo);
+  font-size: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.signin-btn:hover {
+  background-color: #eee;
+}
+
+.separador {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.separador hr {
+  flex: 1;
+  border: none;
+  height: 1px;
+  background-color: #444;
+}
+
+.separador span {
+  margin: 0 1rem;
+}
+
+.dlcc-google {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  border: 2px solid var(--color-primario);
+  border-radius: 12px;
+  background-color: var(--color-fondo);
+  color: var(--color-primario);
+  cursor: pointer;
+  font-weight: bold;
+  transition: all, border-color 0.3s;
+}
+
+.dlcc-google:hover {
+  background-color: #ccc;
+}
+
+.dlcc-google img {
+  width: 20px;
+  height: 20px;
+}
+
+.dlcc-crear {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.dlcc-crear a {
+  color: white;
+  text-decoration: none;
+}

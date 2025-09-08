@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mis casos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin/gestion_usuarios.css">
+</head>
+<body>
+    <div class="menu">
+      <div class="menu-logo">
+          <img src="../imagenes/logo.png" alt="Logo" />
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/inicio}'|">
+          <img src="../imagenes/admin_inicio.png" alt="Inicio" />
+          <span>Inicio</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_procesos_legales}'|">
+          <img src="../imagenes/casos.png" alt="Procesos Legales" />
+          <span>Procesos Legales</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_estados}'|">
+          <img src="../imagenes/casos.png" alt="Estados de Procesos" />
+          <span>Estados de Procesos</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_eventos}'|">
+          <img src="../imagenes/casos.png" alt="Audiencias / Eventos" />
+          <span>Audiencias / Eventos</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_documentos}'|">
+          <img src="../imagenes/casos.png" alt="Documentos" />
+          <span>Documentos</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_usuarios}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Usuarios" />
+          <span>Usuarios</span>
+      </div>
+
+      <div class="menu-item activo" th:onclick="|window.location.href='@{/admin/gestion_roles}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Roles" />
+          <span>Roles</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_clientes}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Clientes" />
+          <span>Clientes</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_abogados}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Abogados" />
+          <span>Abogados</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_permisos}'|">
+          <img src="../imagenes/admin_usuario.png" alt="Permisos" />
+          <span>Permisos</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_notificaciones}'|">
+          <img src="../imagenes/admin_comunicacion.png" alt="Notificaciones" />
+          <span>Notificaciones</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_observaciones}'|">
+          <img src="../imagenes/admin_comunicacion.png" alt="Observaciones" />
+          <span>Observaciones</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_chats}'|">
+          <img src="../imagenes/admin_comunicacion.png" alt="Chats" />
+          <span>Chats</span>
+      </div>
+
+      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_ajustes}'|">
+          <img src="../imagenes/ajustes.png" alt="Ajustes" />
+          <span>Ajustes</span>
+      </div>
+  </div>
+
+    <div class="encabezado">
+      <div class="encabezado-buscar">
+        <div class="div-buscar">
+          <div class="div-img-buscar">
+            <img src="https://img.icons8.com/ios-glyphs/20/999999/search--v1.png" class="img-buscar" alt="Buscar" />
+          </div>
+          <div class="div-input-buscar">
+            <input type="text" placeholder="Buscar..." class="input-buscar" />
+          </div>
+        </div>
+      </div>
+      <div class="encabezado-botones">
+        <div class="menu-item item-notificacion">
+            <img src="../imagenes/notificaciones.png" alt="Notificacion" />
+        </div>
+        <div class="menu-item item-perfil">
+            K
+        </div>
+      </div>
+    </div>
+
+    <div class="div-contenido">
+
+      <div class="div-titulo-seccion">
+        <div>
+          <h2 class="h2-titulo-seccion">Gestion de estados de procesos</h2>
+        </div>
+        <div>
+          <button class="dt-btn-agregar" id="btn-agregar">+ Agregar</button>
+        </div>
+      </div>
+
+    <div class="div-tabla-contenido">
+        <div class="tabla-scroll">
+            <table class="tabla-contenido">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Activo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="rol : ${roles}" th:attr="data-id=${rol.id}">
+                        <td th:text="${rol.id}"></td>
+                        <td th:text="${rol.nombre}"></td>
+                        <td th:text="${rol.activo ? 'Sí' : 'No'}"></td>
+                        <td class="acciones">
+                          <button class="btn-editar" title="Editar">
+                              <img src="../imagenes/editar.png" alt="Editar">
+                          </button>
+                          <button class="btn-eliminar" title="Eliminar">
+                              <img src="../imagenes/eliminar.png" alt="Eliminar">
+                          </button>
+                      </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- PAGINACIÓN -->
+    <div class="paginacion" th:if="${totalPaginas > 0}">
+        <a th:if="${paginaActual > 0}"
+        th:href="@{/admin/gestion_roles(pagina=${paginaActual - 1}, tamano=10)}">&laquo; Anterior</a>
+
+        <span th:each="i : ${#numbers.sequence(0, totalPaginas - 1)}">
+            <a th:href="@{/admin/gestion_roles(pagina=${i}, tamano=10)}"
+            th:text="${i + 1}"
+            th:classappend="${i == paginaActual} ? 'activo' : ''"></a>
+        </span>
+
+        <a th:if="${paginaActual < totalPaginas - 1}"
+        th:href="@{/admin/gestion_roles(pagina=${paginaActual + 1}, tamano=10)}">Siguiente &raquo;</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".btn-eliminar").forEach(function(button) {
+        button.addEventListener("click", function(event) {
+            event.preventDefault();
+
+            let fila = button.closest("tr");
+            let idRol = fila.getAttribute("data-id"); // ID del rol
+            let nombre = fila.querySelector("td:nth-child(2)").innerText; // Nombre
+            let activo = fila.querySelector("td:nth-child(3)").innerText; // Activo
+
+            Swal.fire({
+                title: "¿Estás seguro?",
+                html: `
+                    <p>Vas a eliminar el rol:</p>
+                    <b>ID:</b> ${idRol}<br>
+                    <b>Nombre:</b> ${nombre}<br>
+                    <b>Activo:</b> ${activo}
+                `,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/eliminar_rol/${idRol}`, {
+                        method: "DELETE"
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            Swal.fire("Eliminado", "El rol ha sido eliminado.", "success");
+                            fila.remove(); // Elimina la fila de la tabla sin recargar
+                        } else {
+                            Swal.fire("Error", "No se pudo eliminar el rol.", "error");
+                        }
+                    })
+                    .catch(() => {
+                        Swal.fire("Error", "Hubo un problema de conexión.", "error");
+                    });
+                }
+            });
+        });
+    });
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.22.4"></script>
+<script>
+'use strict';
+
+const CONFIG = {
+    minCaracteres: 3,
+    maxCaracteres: 50,
+    endpoint: "/admin/guardar_rol" // POST para agregar o editar
+};
+
+const MENSAJES = {
+    tituloAgregar: "Agregar nuevo rol",
+    tituloEditar: "Editar rol",
+    nombreObligatorio: "El nombre es obligatorio",
+    longitudNombre: `El nombre debe tener entre ${CONFIG.minCaracteres} y ${CONFIG.maxCaracteres} caracteres`,
+    exitoAgregar: "El estado ha sido agregado correctamente",
+    exitoEditar: "El estado ha sido editado correctamente",
+    errorGeneral: "No se pudo guardar el estado",
+    confirmacion: "Guardado"
+};
+
+// Genera el contenido HTML del modal
+function generarFormulario(estado = {}) {
+    const nombre = estado.nombre || '';
+    const activo = estado.activo !== false;
+
+    return `
+        <style>
+            .etiqueta-swal { display: block; margin-bottom: 5px; font-weight: bold; color: var(--color-secundario); text-align: left; }
+            .entrada-swal { border-radius: 8px; border: 1px solid #ccc; padding: 8px; margin-bottom: 15px; font-size: 14px; width: 100%; text-align: left; box-sizing: border-box; }
+            .contenedor-interruptor { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+            .interruptor { position: relative; display: inline-block; width: 50px; height: 25px; }
+            .interruptor input { opacity: 0; width: 0; height: 0; }
+            .deslizador { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 25px; }
+            .deslizador:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 3.5px; background-color: white; transition: .4s; border-radius: 50%; }
+            input:checked + .deslizador { background-color: var(--color-primario); }
+            input:checked + .deslizador:before { transform: translateX(24px); }
+        </style>
+
+        <label class="etiqueta-swal">Nombre:</label>
+        <input id="nombreEstado" type="text" class="entrada-swal" placeholder="Ej: Cliente" value="${nombre}" maxlength="${CONFIG.maxCaracteres}" autocomplete="off">
+
+        <label class="etiqueta-swal">Estado:</label>
+        <div class="contenedor-interruptor">
+            <label class="interruptor" role="switch" aria-checked="${activo}" aria-label="Activar o desactivar estado">
+                <input id="estadoActivo" type="checkbox" ${activo ? 'checked' : ''}>
+                <span class="deslizador" aria-hidden="true"></span>
+            </label>
+            <span id="textoEstadoActivo">${activo ? 'Activo' : 'Inactivo'}</span>
+        </div>
+    `;
+}
+
+// Configura el evento del interruptor
+function configurarInterruptor() {
+    const check = document.getElementById("estadoActivo");
+    const texto = document.getElementById("textoEstadoActivo");
+    if (!check || !texto) return;
+    check.addEventListener("change", () => {
+        const estado = check.checked;
+        texto.textContent = estado ? "Activo" : "Inactivo";
+        check.parentElement.setAttribute("aria-checked", estado);
+    });
+}
+
+// Extrae los datos de una fila
+function extraerDatosFila(fila) {
+    return {
+        id: fila.dataset.id,
+        nombre: fila.querySelector('td:nth-child(2)').textContent.trim(),
+        activo: fila.querySelector('td:nth-child(3)').textContent.trim() === 'Sí'
+    };
+}
+
+// Envía datos al servidor
+async function enviarEstado(estado) {
+    const formData = new FormData();
+    if (estado.id) formData.append("id", estado.id);
+    formData.append("nombre", estado.nombre);
+    formData.append("activo", estado.activo);
+
+    const resp = await fetch(CONFIG.endpoint, { method: "POST", body: formData });
+    if (!resp.ok) {
+        const error = await resp.text();
+        throw new Error(error || MENSAJES.errorGeneral);
+    }
+}
+
+// Abre el modal para agregar o editar
+async function abrirModal(estado = {}) {
+    const esEdicion = Boolean(estado.id);
+
+    const resultado = await Swal.fire({
+        title: esEdicion ? MENSAJES.tituloEditar : MENSAJES.tituloAgregar,
+        html: generarFormulario(estado),
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: "Guardar",
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: "var(--color-secundario)",
+        cancelButtonColor: "#888",
+        showLoaderOnConfirm: true,
+        didOpen: configurarInterruptor,
+        preConfirm: async () => {
+            const nombre = document.getElementById("nombreEstado").value.trim();
+            const activo = document.getElementById("estadoActivo").checked;
+
+            if (!nombre) return Swal.showValidationMessage(MENSAJES.nombreObligatorio);
+            if (nombre.length < CONFIG.minCaracteres || nombre.length > CONFIG.maxCaracteres)
+                return Swal.showValidationMessage(MENSAJES.longitudNombre);
+
+            try {
+                await enviarEstado({ id: estado.id, nombre, activo });
+                return true;
+            } catch (err) {
+                Swal.showValidationMessage(`Error: ${err.message}`);
+                return false;
+            }
+        }
+    });
+
+    if (resultado.isConfirmed) {
+        await Swal.fire({ title: MENSAJES.confirmacion, text: esEdicion ? MENSAJES.exitoEditar : MENSAJES.exitoAgregar, icon: "success", timer: 2000, showConfirmButton: false });
+        location.reload();
+    }
+}
+
+// Inicializa eventos de agregar y editar
+function inicializarEventos() {
+    const botonAgregar = document.getElementById("btn-agregar");
+    if (botonAgregar) botonAgregar.addEventListener("click", () => abrirModal());
+
+    document.querySelectorAll(".btn-editar").forEach(boton => {
+        boton.addEventListener("click", e => {
+            const fila = e.target.closest("tr");
+            if (fila) abrirModal(extraerDatosFila(fila));
+        });
+    });
+}
+
+document.addEventListener("DOMContentLoaded", inicializarEventos);
+</script>
+
+    </div>
+  </body>
+</html>

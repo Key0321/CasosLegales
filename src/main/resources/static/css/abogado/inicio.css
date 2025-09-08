@@ -1,0 +1,159 @@
+.div-titulo-seccion {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;            
+}
+
+.h2-titulo-seccion {
+  margin: 0px;
+  font-size: 30px;
+  color: var(--color-secundario);
+}
+
+.div-filtros {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.filtro {
+  padding: 0.5rem 1rem;
+  background-color: var(--color-blanco);
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filtro.activo {
+  background-color: color-mix(in srgb, var(--color-secundario) 60%, transparent);
+  border-color: color-mix(in srgb, var(--color-secundario) 60%, transparent);
+  color: white;
+}
+
+
+.cantidad {
+  background-color: #eee;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.cantidad.activo{
+  background-color: var(--color-secundario);
+}
+
+.grid-tarjetas {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 2rem;
+}
+
+.tarjeta {
+  background-color: var(--color-blanco);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  transition: transform 0.2s;
+}
+
+.tarjeta:hover {
+  transform: translateY(-5px);
+}
+
+.icono-tarjeta {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #1E88E5;
+  padding: 6px;
+}
+
+.icono-tarjeta img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.estado-tramite {
+  background-color: #1E88E5;
+}
+
+.estado-sentencia {
+  background-color: var(--color-primario); /* #D4AF37 */
+}
+
+.estado-finalizado {
+  background-color: #43A047;
+}
+
+.estado-archivado {
+  background-color: #9E9E9E;
+}
+
+h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--color-secundario);
+}
+
+.detalle {
+  font-size: 13px;
+  color: var(--color-texto);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.descripcion-tarjeta {
+  font-size: 12.5px;
+  color: #666;
+  line-height: 1.4;
+  margin: 0;
+  min-height: 60px;
+}
+
+.footer-tarjeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--color-texto);
+}
+
+.tarjeta-enlace {
+  text-decoration: none;   
+  color: inherit;          
+  display: block;          
+}
+
+.tarjeta-enlace:visited,
+.tarjeta-enlace:hover,
+.tarjeta-enlace:active {
+  text-decoration: none;
+  color: inherit;
+}
+
+.dt-btn-agregar {
+  width: 100%;
+  border: none;
+  padding: 10px;
+  background-color: var(--color-secundario);
+  color: var(--color-fondo);
+  font-size: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.dt-btn-agregar:hover {
+   opacity: 0.8;
+}
