@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.uteq.casoslegales.casoslegales.Modelo.Acceso;
+import com.uteq.casoslegales.casoslegales.Modelo.Rol;
 import com.uteq.casoslegales.casoslegales.Modelo.Usuario;
 import com.uteq.casoslegales.casoslegales.Servicio.AccesoServicio;
 import com.uteq.casoslegales.casoslegales.Servicio.RolServicio;
@@ -156,7 +157,12 @@ public class UsuarioControlador {
 
             usuario = usuarioServicio.guardar(usuario);
 
-            jdbcTemplate.execute("CALL crear_usuario_db('" + usuario.getCorreo() + "', '" + usuario.getContrasenia() + "')");
+            // Obtener nombre del rol para asignar permisos en BD
+            Rol rol = rolServicio.obtenerPorId(usuario.getRol().getId())
+                    .orElseThrow(() -> new Exception("Rol no encontrado"));
+            
+            // Crear usuario en PostgreSQL con permisos según rol
+            jdbcTemplate.execute("CALL crear_usuario_db('" + usuario.getCorreo() + "', '" + usuario.getContrasenia() + "', '" + rol.getNombre() + "')");
 
             redirectAttributes.addFlashAttribute("exito", true);
             return "redirect:/admin/gestion_usuarios_agregar";
