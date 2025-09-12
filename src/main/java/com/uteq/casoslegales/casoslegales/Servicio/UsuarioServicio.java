@@ -1,13 +1,18 @@
 package com.uteq.casoslegales.casoslegales.Servicio;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,6 +103,16 @@ public class UsuarioServicio {
     @Transactional(rollbackFor = Exception.class)
     public void eliminar(Long id) {
         usuarioRepo.deleteById(id);
+    }
+
+   public Page<Usuario> listarPaginadosConFiltro(String busqueda, Long creadorId, int pagina, int tamano) {
+        Pageable pageable = PageRequest.of(pagina, tamano);
+        
+        if (busqueda != null && !busqueda.isEmpty()) {
+            return usuarioRepo.findByCreadorIdAndBusqueda(creadorId, busqueda, pageable);
+        } else {
+            return usuarioRepo.findByCreadoPor_Id(creadorId, pageable);
+        }
     }
 
 }

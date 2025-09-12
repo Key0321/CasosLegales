@@ -75,6 +75,41 @@ public class UsuarioControlador {
         return "admin/gestion_usuarios";
     }
 
+    @GetMapping("/abogado/usuarios")
+    public String listarUsuarios(@RequestParam(defaultValue = "0") int pagina,
+                                @RequestParam(defaultValue = "10") int tamano,
+                                @RequestParam(required = false) String busqueda,
+                                HttpSession session, 
+                                Model model) {
+
+        // Obtener usuario de la sesión
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null || !usuario.getRol().getNombre().equals("Abogado")) {
+            return "redirect:/login";
+        }
+
+        // Listar usuarios con paginación y filtro de búsqueda
+        Page<Usuario> paginaUsuarios = usuarioServicio.listarPaginadosConFiltro(busqueda, usuario.getId(), pagina, tamano);
+
+        // Obtener últimos accesos
+        List<Usuario> usuarios = paginaUsuarios.getContent();
+        Map<Long, Acceso> ultimoAccesoMap = new HashMap<>();
+        for (Usuario u : usuarios) {
+            Acceso ultimo = accesoServicio.obtenerUltimoAcceso(u);
+            ultimoAccesoMap.put(u.getId(), ultimo);
+        }
+
+        model.addAttribute("usuarios", usuarios);
+        model.addAttribute("ultimoAccesoMap", ultimoAccesoMap);
+        model.addAttribute("paginaActual", pagina);
+        model.addAttribute("totalPaginas", paginaUsuarios.getTotalPages());
+        model.addAttribute("totalElementos", paginaUsuarios.getTotalElements());
+        model.addAttribute("filtroBusqueda", busqueda);
+        model.addAttribute("usuarioActual", usuario);
+
+        return "abogado/usuarios";
+    }
+
     @PostMapping("/cerrar_sesion_usuario/{id}")
     public ResponseEntity<?> cerrarSesionUsuario(@PathVariable Long id) {
         try {
@@ -105,7 +140,7 @@ public class UsuarioControlador {
     }
 
     @GetMapping({
-        "/abogado/inicio_agregar_usuario",
+        "/abogado/usuarios_agregar",
         "/admin/gestion_usuarios_agregar",
         "/admin/gestion_clientes_agregar",
         "/admin/gestion_abogados_agregar"
@@ -126,7 +161,7 @@ public class UsuarioControlador {
                 return "admin/gestion_usuarios_agregar";
             }
         } else {
-            return "abogado/inicio_agregar_usuario";
+            return "abogado/usuarios_agregar";
         }
     }
 

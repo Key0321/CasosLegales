@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mis casos / Documentos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/abogado/abogado_menu.css">
+  <link rel="stylesheet" href="/css/abogado/usuarios.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  <div class="menu">
+    <div class="menu-logo">
+      <img th:src="@{/imagenes/logo.png}" alt="Inicio" />
+    </div>
+    <div class="menu-item" th:onclick="|window.location.href='@{/abogado/inicio}'|">
+      <img th:src="@{/imagenes/casos.png}" alt="Mis casos" />
+    </div>
+    <div class="menu-item" th:onclick="|window.location.href='@{/abogado/calendario}'|">
+      <img th:src="@{/imagenes/calendario.png}" alt="Calendar" />
+    </div>
+    <div class="menu-item" th:onclick="|window.location.href='@{/abogado/documentos}'|">
+      <img th:src="@{/imagenes/documentos.png}" alt="Documentos" />
+    </div>
+    <div class="menu-item activo" th:onclick="|window.location.href='@{/abogado/usuarios}'|">
+      <img th:src="@{/imagenes/admin_usuario.png}" alt="Clientes" />
+    </div>
+    <div class="menu-item" th:onclick="|window.location.href='@{/abogado/reportes}'|">
+      <img th:src="@{/imagenes/reporte.png}" alt="Reportes" />
+    </div>
+    <div class="menu-item" th:onclick="|window.location.href='@{/abogado/ajustes}'|">
+      <img th:src="@{/imagenes/ajustes.png}" alt="Ajustes" />
+    </div>
+  </div>
+
+  <div class="encabezado">
+    <div class="encabezado-buscar">
+      <div class="div-buscar">
+        <div class="div-img-buscar">
+          <img src="https://img.icons8.com/ios-glyphs/20/999999/search--v1.png" class="img-buscar" alt="Buscar" />
+        </div>
+        <div class="div-input-buscar">
+          <input type="text" placeholder="Buscar documentos..." class="input-buscar" id="buscarUsuarios" th:value="${filtroBusqueda}" />
+        </div>
+      </div>
+    </div>
+    <div class="encabezado-botones">
+      <div class="menu-item item-notificacion">
+        <img th:src="@{/imagenes/notificaciones.png}" alt="Notificación" />
+      </div>
+      <div class="menu-item item-perfil">
+        <span th:text="${#strings.substring(usuarioActual.nombre, 0, 1) + #strings.substring(usuarioActual.apellido, 0, 1)}">US</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="div-contenido">
+  <div class="div-titulo-seccion">
+    <div>
+      <h2 class="h2-titulo-seccion">Gestión de Usuarios</h2>
+    </div>
+    <div>
+      <button class="dt-btn-agregar" th:onclick="|window.location.href='@{/abogado/usuarios_agregar}'|">+ Agregar</button>
+    </div>
+  </div>
+
+  <div class="div-contenido-unificado">
+
+    <div class="div-tabla-contenido">
+      <div class="tabla-scroll">
+        <table class="tabla-contenido">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Último Acceso</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="usuario : ${usuarios}" th:attr="data-id=${usuario.id}">
+              <td>
+                <div class="columna-nombre">
+                  <div class="info-usuario">
+                    <h4 th:text="${usuario.nombre + ' ' + usuario.apellido}">Nombre Apellido</h4>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="columna-correo">
+                  <span th:text="${usuario.correo}">correo@ejemplo.com</span>
+                </div>
+              </td>
+              <td>
+                <div class="columna-acceso">
+                  <span th:text="${ultimoAccesoMap.get(usuario.id)?.fechaAcceso != null ? #temporals.format(ultimoAccesoMap.get(usuario.id).fechaAcceso, 'dd/MM/yyyy HH:mm') : '—'}">Fecha Acceso</span>
+                </div>
+              </td>
+              <td class="acciones">
+                <button class="btn-accion ver" 
+                        th:attr="data-id=${usuario.id}"
+                        onclick="verUsuario(this.getAttribute('data-id'))">
+                  <img th:src="@{/imagenes/ver.png}" alt="Ver" />
+                </button>
+                <button class="btn-accion eliminar" 
+                        th:data-id="${usuario.id}"
+                        onclick="eliminarUsuario(this.getAttribute('data-id'))">
+                  <img th:src="@{/imagenes/eliminar.png}" alt="Eliminar" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="paginacion" th:if="${totalPaginas > 0}">
+      <a th:if="${paginaActual > 0}"
+        th:href="@{/abogado/usuarios(pagina=${paginaActual - 1}, tamano=10)}">&laquo; Anterior</a>
+
+      <span th:each="i : ${#numbers.sequence(0, totalPaginas - 1)}">
+          <a th:href="@{/abogado/usuarios(pagina=${i}, tamano=10)}"
+            th:text="${i + 1}"
+            th:classappend="${i == paginaActual} ? 'activo' : ''"></a>
+      </span>
+
+      <a th:if="${paginaActual < totalPaginas - 1}"
+        th:href="@{/abogado/usuarios(pagina=${paginaActual + 1}, tamano=10)}">Siguiente &raquo;</a>
+  </div> 
+  </div>
+</div>
+
+<script>
+  // Debounce para búsqueda
+  function debounce(func, delay) {
+    let timeoutId;
+    return function (...args) {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+  }
+
+  document.getElementById('buscarUsuarios').addEventListener('keyup', debounce(filtrarUsuarios, 500));
+
+  function filtrarUsuarios() {
+    const filtroTexto = document.getElementById('buscarUsuarios').value.trim();
+    const params = new URLSearchParams();
+    if (filtroTexto) params.append('busqueda', filtroTexto);
+    params.append('pagina', '0');
+    window.location.href = '/abogado/usuarios?' + params.toString();
+  }
+
+  function verUsuario(id) {
+    window.location.href = `/abogado/usuarios/${id}`;
+  }
+
+  function eliminarUsuario(id) {
+    const fila = document.querySelector(`tr[data-id="${id}"]`);
+    const nombre = fila.querySelector("td:nth-child(1) .info-usuario h4").innerText;
+    const correo = fila.querySelector("td:nth-child(2) .columna-correo span").innerText;
+
+    Swal.fire({
+      title: "¿Estás seguro?",
+      html: `
+        <p>Vas a eliminar el usuario:</p>
+        <b>Nombre:</b> ${nombre}<br>
+        <b>Correo:</b> ${correo}
+      `,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/admin/eliminar_usuario/${id}`, {
+          method: "DELETE"
+        })
+        .then(response => {
+          if (response.ok) {
+            Swal.fire("Eliminado", "El usuario ha sido eliminado.", "success");
+            fila.remove();
+          } else {
+            Swal.fire("Error", "No se pudo eliminar el usuario.", "error");
+          }
+        })
+        .catch(() => {
+          Swal.fire("Error", "Hubo un problema de conexión.", "error");
+        });
+      }
+    });
+  }
+</script>
+</body>
+</html>
