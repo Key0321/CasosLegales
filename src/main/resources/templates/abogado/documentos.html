@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mis casos / Documentos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/abogado/abogado_menu.css">
+  <link rel="stylesheet" href="/css/abogado/documentos.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  <div class="menu">
+    <div class="menu-logo">
+      <img th:src="@{/imagenes/logo.png}" alt="Inicio" />
+    </div>
+    <div class="menu-item" th:onclick="|window.location.href='@{/abogado/inicio}'|">
+      <img th:src="@{/imagenes/casos.png}" alt="Mis casos" />
+    </div>
+    <div class="menu-item" th:onclick="|window.location.href='@{/abogado/calendario}'|">
+      <img th:src="@{/imagenes/calendario.png}" alt="Calendar" />
+    </div>
+    <div class="menu-item activo" th:onclick="|window.location.href='@{/abogado/documentos}'|">
+      <img th:src="@{/imagenes/documentos.png}" alt="Documentos" />
+    </div>
+    <div class="menu-item" th:onclick="|window.location.href='@{/abogado/usuarios}'|">
+      <img th:src="@{/imagenes/admin_usuario.png}" alt="Clientes" />
+    </div>
+    <div class="menu-item" th:onclick="|window.location.href='@{/abogado/reportes}'|">
+      <img th:src="@{/imagenes/reporte.png}" alt="Reportes" />
+    </div>
+    <div class="menu-item" th:onclick="|window.location.href='@{/abogado/ajustes}'|">
+      <img th:src="@{/imagenes/ajustes.png}" alt="Ajustes" />
+    </div>
+  </div>
+
+  <div class="encabezado">
+    <div class="encabezado-buscar">
+      <div class="div-buscar">
+        <div class="div-img-buscar">
+          <img src="https://img.icons8.com/ios-glyphs/20/999999/search--v1.png" class="img-buscar" alt="Buscar" />
+        </div>
+        <div class="div-input-buscar">
+          <input type="text" placeholder="Buscar documentos..." class="input-buscar" id="buscarDocumentos" th:value="${filtroBusqueda}" />
+        </div>
+      </div>
+    </div>
+    <div class="encabezado-botones">
+      <div class="menu-item item-notificacion">
+        <img th:src="@{/imagenes/notificaciones.png}" alt="Notificación" />
+      </div>
+      <div class="menu-item item-perfil">
+        <span th:text="${#strings.substring(usuarioActual.nombre, 0, 1) + #strings.substring(usuarioActual.apellido, 0, 1)}">US</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="div-contenido">
+  <div class="div-titulo-seccion">
+    <div>
+      <h2 class="h2-titulo-seccion">Documentos</h2>
+    </div>
+    <div>
+      <button class="dt-btn-agregar" th:onclick="|window.location.href='@{/admin/gestion_documentos_agregar}'|" th:if="${rolUsuario == 'abogado'}">+ Agregar</button>
+    </div>
+  </div>
+
+  <div class="div-contenido-unificado">
+    <div class="div-filtros-avanzados">
+      <div class="filtros-avanzados">
+        <select class="filtro-select" id="filtroProceso">
+          <option value="" th:selected="${filtroProceso == null || filtroProceso == ''}">Todos los procesos</option>
+          <option th:each="proceso : ${procesosUnicos}" 
+                  th:value="${proceso.id}" 
+                  th:text="${proceso.numeroProceso + ' - ' + (proceso.cliente?.usuario?.nombre ?: '') + ' ' + (proceso.cliente?.usuario?.apellido ?: '')}"
+                  th:selected="${proceso.id == filtroProceso}">
+          </option>
+        </select>
+        <select class="filtro-select" id="filtroAnio">
+          <option value="" th:selected="${filtroAnio == null || filtroAnio == ''}">Todos los años</option>
+          <option th:each="anio : ${aniosUnicos}" th:value="${anio}" th:text="${anio}" th:selected="${anio == filtroAnio}"></option>
+        </select>
+        <select class="filtro-select" id="filtroTipo">
+          <option value="" th:selected="${filtroTipo == null || filtroTipo == ''}">Todos los tipos</option>
+          <option th:each="tipo : ${tiposUnicos}" th:value="${tipo}" th:text="${tipo}" th:selected="${tipo == filtroTipo}"></option>
+        </select>
+      </div>
+    </div>
+
+    <div class="div-tabla-contenido">
+      <div class="tabla-scroll">
+        <table class="tabla-contenido">
+          <thead>
+            <tr>
+              <th>Documento</th>
+              <th>Proceso</th>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="documento : ${documentos}" th:attr="data-id=${documento.id}">
+              <td>
+                <div class="columna-documento">
+                  <div class="info-documento">
+                    <h4 th:text="${documento.nombre}">Nombre del documento</h4>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="columna-proceso">
+                  <span class="numero-proceso" th:text="${documento.proceso?.numeroProceso ?: '—'}">Nº proceso</span>
+                  <span class="cliente-proceso" th:text="${documento.proceso?.cliente?.usuario?.nombre + ' ' + documento.proceso?.cliente?.usuario?.apellido ?: 'Cliente desconocido'}">Cliente</span>
+                </div>
+              </td>
+              <td>
+                <div class="columna-fecha">
+                  <span th:text="${#temporals.format(documento.fechaCreacion, 'dd/MM/yyyy')}">Fecha</span>
+                  <span class="anio-documento" th:text="${documento.anio}">Año</span>
+                </div>
+              </td>
+              <td>
+                <span class="badge-tipo" th:text="${documento.tipoDocumento ?: '—'}">Tipo</span>
+              </td>
+              <td class="acciones">
+                <button class="btn-accion ver" 
+                        th:data-ruta="${documento.rutaArchivo}"
+                        onclick="verDocumento(this.getAttribute('data-ruta'))">
+                  <img th:src="@{/imagenes/ver.png}" alt="Ver" />
+                </button>
+                <button class="btn-accion eliminar" 
+                        th:data-id="${documento.id}"
+                        onclick="eliminarDocumento(this.getAttribute('data-id'))">
+                  <img th:src="@{/imagenes/eliminar.png}" alt="Eliminar" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="paginacion" th:if="${totalPaginas > 0}">
+      <a th:if="${paginaActual > 0}"
+         th:href="@{/abogado/documentos(pagina=${paginaActual - 1}, tamano=10, busqueda=${filtroBusqueda}, proceso=${filtroProceso}, anio=${filtroAnio}, tipo=${filtroTipo})}">&laquo; Anterior</a>
+      <span th:each="i : ${#numbers.sequence(0, totalPaginas - 1)}">
+        <a th:href="@{/abogado/documentos(pagina=${i}, tamano=10, busqueda=${filtroBusqueda}, proceso=${filtroProceso}, anio=${filtroAnio}, tipo=${filtroTipo})}"
+           th:text="${i + 1}"
+           th:classappend="${i == paginaActual} ? 'activo' : ''"></a>
+      </span>
+      <a th:if="${paginaActual < totalPaginas - 1}"
+         th:href="@{/abogado/documentos(pagina=${paginaActual + 1}, tamano=10, busqueda=${filtroBusqueda}, proceso=${filtroProceso}, anio=${filtroAnio}, tipo=${filtroTipo})}">Siguiente &raquo;</a>
+    </div>
+  </div>
+</div>
+
+  <script>
+    // Debounce para búsqueda
+    function debounce(func, delay) {
+      let timeoutId;
+      return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+      };
+    }
+
+    // Fix: Use buscarDocumentos for both inputs
+    document.getElementById('buscarDocumentos').addEventListener('keyup', debounce(filtrarDocumentos, 500));
+    document.getElementById('filtroProceso').addEventListener('change', filtrarDocumentos);
+    document.getElementById('filtroAnio').addEventListener('change', filtrarDocumentos);
+    document.getElementById('filtroTipo').addEventListener('change', filtrarDocumentos);
+
+    function filtrarDocumentos() {
+      const filtroTexto = document.getElementById('buscarDocumentos').value.trim();
+      const filtroProceso = document.getElementById('filtroProceso').value;
+      const filtroAnio = document.getElementById('filtroAnio').value;
+      const filtroTipo = document.getElementById('filtroTipo').value;
+
+      const params = new URLSearchParams();
+      if (filtroTexto) params.append('busqueda', filtroTexto);
+      if (filtroProceso) params.append('proceso', filtroProceso);
+      if (filtroAnio) params.append('anio', filtroAnio);
+      if (filtroTipo) params.append('tipo', filtroTipo);
+      params.append('pagina', '0');
+
+      window.location.href = '/abogado/documentos?' + params.toString();
+    }
+
+    function verDocumento(ruta) {
+      window.open('/ver' + ruta, '_blank');
+    }
+
+    function eliminarDocumento(id) {
+      const fila = document.querySelector(`tr[data-id="${id}"]`);
+      const proceso = fila.querySelector("td:nth-child(2) .numero-proceso").innerText;
+      const nombre = fila.querySelector("td:nth-child(1) .info-documento h4").innerText;
+
+      Swal.fire({
+        title: "¿Estás seguro?",
+        html: `
+          <p>Vas a eliminar el documento:</p>
+          <b>ID:</b> ${id}<br>
+          <b>Proceso:</b> ${proceso}<br>
+          <b>Nombre:</b> ${nombre}
+        `,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          fetch(`/eliminar_documento/${id}`, {
+            method: "DELETE"
+          })
+          .then(response => {
+            if (response.ok) {
+              Swal.fire("Eliminado", "El registro ha sido eliminado.", "success");
+              fila.remove();
+            } else {
+              Swal.fire("Error", "No se pudo eliminar el registro.", "error");
+            }
+          })
+          .catch(() => {
+            Swal.fire("Error", "Hubo un problema de conexión.", "error");
+          });
+        }
+      });
+    }
+  </script>
+</body>
+</html>

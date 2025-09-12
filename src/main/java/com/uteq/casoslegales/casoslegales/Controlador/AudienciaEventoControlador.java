@@ -118,7 +118,7 @@ public class AudienciaEventoControlador {
         return "redirect:/admin/gestion_permisos";
     }
 
-    @GetMapping("/abogado/calendario")
+    @GetMapping({"/abogado/calendario", "/cliente/calendario"})
     public String mostrarCalendario(HttpSession session, Model model) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         if (usuario == null) {
@@ -154,7 +154,8 @@ public class AudienciaEventoControlador {
         model.addAttribute("currentYear", LocalDateTime.now().getYear());
         model.addAttribute("currentMonth", LocalDateTime.now().getMonthValue() - 1);
 
-        return "abogado/calendario";
+         return "abogado".equalsIgnoreCase(usuario.getRol().getNombre()) ? 
+               "abogado/calendario" : "cliente/calendario";
     }
 
     @PostMapping("/abogado/guardar-evento")

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+html<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
@@ -16,22 +16,13 @@
       <div class="menu-logo">
           <img th:src="@{/imagenes/logo.png}" alt="Inicio" />
       </div>
-      <div class="menu-item activo" th:onclick="|window.location.href='@{/abogado/inicio}'|">
+      <div class="menu-item activo" th:onclick="|window.location.href='@{/cliente/inicio}'|">
           <img th:src="@{/imagenes/casos.png}" alt="Mis casos" />
       </div>
-      <div class="menu-item" th:onclick="|window.location.href='@{/abogado/calendario}'|">
+      <div class="menu-item" th:onclick="|window.location.href='@{/cliente/calendario}'|">
           <img th:src="@{/imagenes/calendario.png}" alt="Calendar" />
       </div>
-      <div class="menu-item" th:onclick="|window.location.href='@{/abogado/documentos}'|">
-          <img th:src="@{/imagenes/documentos.png}" alt="Documentos" />
-      </div>
-      <div class="menu-item" th:onclick="|window.location.href='@{/abogado/usuarios}'|">
-          <img th:src="@{/imagenes/admin_usuario.png}" alt="Clientes" />
-      </div>
-      <div class="menu-item" th:onclick="|window.location.href='@{/abogado/reportes}'|">
-          <img th:src="@{/imagenes/reporte.png}" alt="Reportes" />
-      </div>
-      <div class="menu-item" th:onclick="|window.location.href='@{/abogado/ajustes}'|">
+      <div class="menu-item" th:onclick="|window.location.href='@{/cliente/ajustes}'|">
           <img th:src="@{/imagenes/ajustes.png}" alt="Ajustes" />
       </div>
     </div>
@@ -123,19 +114,19 @@
               Información
             </h3>
             <div class="contenido-detalle">
-              <div class="item-info" onclick="openEditModal('numeroProceso', '${proceso.numeroProceso}')">
+              <div class="item-info">
                 <span class="etiqueta-info">Número de caso:</span>
                 <span class="valor-info" th:text="${proceso.numeroProceso}">ABC-123</span>
               </div>
-              <div class="item-info" onclick="openEditModal('descripcion', '${proceso.descripcion}')">
+              <div class="item-info">
                 <span class="etiqueta-info">Descripción:</span>
                 <span class="valor-info" th:text="${proceso.descripcion ?: 'Sin descripción'}">Descripción del caso...</span>
               </div>
-              <div class="item-info" onclick="openEditModal('estado', '${proceso.estado.nombre}')">
+              <div class="item-info">
                 <span class="etiqueta-info">Estado:</span>
                 <span class="valor-info" th:text="${proceso.estado.nombre}">En progreso</span>
               </div>
-              <div class="item-info" onclick="openEditModal('fechaInicio', '${#temporals.format(proceso.fechaInicio, \'yyyy-MM-dd\')}')">
+              <div class="item-info">
                 <span class="etiqueta-info">Fecha inicio:</span>
                 <span class="valor-info" th:text="${#temporals.format(proceso.fechaInicio, 'dd/MM/yyyy')}">01/01/2023</span>
               </div>
@@ -159,9 +150,6 @@
                   <span class="rol-persona" th:text="${pu.usuario.rol.nombre}">Rol</span>
                 </div>
                 <span th:if="${pu.esResponsablePrincipal}" class="insignia-persona">Principal</span>
-                <button class="btn-eliminar-usuario" th:attr="data-usuario-id=${pu.usuario.id}" title="Eliminar">
-                  <i class="fas fa-trash"></i>
-                </button>
               </div>
               
               <!-- Cliente -->
@@ -174,16 +162,6 @@
                   <span class="rol-persona">Cliente</span>
                 </div>
               </div>
-
-              <!-- Agregar nuevo -->
-              <div class="item-persona agregar-nuevo" onclick="openAddUserModal()">
-                <div class="avatar-persona">
-                  <i class="fas fa-plus"></i>
-                </div>
-                <div class="info-persona">
-                  <span class="nombre-persona">Agregar nuevo</span>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -192,7 +170,6 @@
             <h3 class="titulo-detalle">
               <i class="fas fa-calendar-alt"></i>
               Eventos
-              <button id="crear-evento" class="btn-crear">+ Nuevo Evento</button>
             </h3>
             <div class="lista-eventos" id="lista-eventos">
               <div class="sin-eventos" id="sin-eventos">
@@ -241,92 +218,6 @@
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal para editar info proceso -->
-    <div id="modal-edit-info" class="modal">
-      <div class="contenido-modal">
-        <div class="cabecera-modal">
-          <h2>Editar Información</h2>
-          <button class="cerrar-modal" aria-label="Cerrar"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="cuerpo-modal">
-          <form id="form-edit-info" method="post" th:action="@{/abogado/actualizar-proceso/{id}(id=${proceso.id})}">
-            <input type="hidden" id="edit-field" name="field">
-            <div class="form-grupo" id="edit-field-container">
-              <label id="edit-label" for="edit-value"></label>
-              <input type="text" id="edit-value" name="value" required>
-            </div>
-            <div class="modal-acciones">
-              <button type="button" class="btn-cancelar" onclick="closeModal('modal-edit-info')">Cancelar</button>
-              <button type="submit" class="btn-guardar">Guardar</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal para agregar usuario involucrado -->
-    <div id="modal-add-user" class="modal">
-      <div class="contenido-modal">
-        <div class="cabecera-modal">
-          <h2>Agregar Persona Involucrada</h2>
-          <button class="cerrar-modal" aria-label="Cerrar"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="cuerpo-modal">
-          <form id="form-add-user" method="post" th:action="@{/abogado/agregar-usuario-proceso/{id}(id=${proceso.id})}">
-            <div class="form-grupo">
-              <label for="usuario-id">Seleccionar Usuario:</label>
-              <select id="usuario-id" name="usuarioId" required>
-                <option value="">Seleccione un usuario</option>
-                <option th:each="usuario : ${usuariosDisponibles}" 
-                        th:value="${usuario.id}" 
-                        th:text="${usuario.nombre + ' ' + usuario.apellido}"></option>
-              </select>
-            </div>
-            <div class="form-grupo">
-              <label for="es-principal">Responsable Principal:</label>
-              <input type="checkbox" id="es-principal" name="esResponsablePrincipal">
-            </div>
-            <div class="modal-acciones">
-              <button type="button" class="btn-cancelar" onclick="closeModal('modal-add-user')">Cancelar</button>
-              <button type="submit" class="btn-guardar">Agregar</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal para nuevo evento -->
-    <div id="modal-evento" class="modal">
-      <div class="contenido-modal">
-        <div class="cabecera-modal">
-          <h2 id="titulo-modal-evento">Nuevo Evento</h2>
-          <button class="cerrar-modal" aria-label="Cerrar"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="cuerpo-modal">
-          <form id="form-evento" th:action="@{/abogado/guardar-evento2}" method="post">
-            <input type="hidden" id="evento-id" name="id">
-            <input type="hidden" name="proceso.id" th:value="${proceso.id}">
-            <div class="form-grupo">
-              <label for="evento-tipo">Tipo de Evento:</label>
-              <input type="text" id="evento-tipo" name="tipoEvento" placeholder="Ingrese el tipo de evento" required>
-            </div>
-            <div class="form-grupo">
-              <label for="evento-descripcion">Descripción:</label>
-              <textarea id="evento-descripcion" name="descripcion" placeholder="Ingrese la descripción" rows="3"></textarea>
-            </div>
-            <div class="form-grupo">
-              <label for="evento-fecha">Fecha y hora:</label>
-              <input type="datetime-local" id="evento-fecha" name="fechaEvento" required>
-            </div>
-            <div class="modal-acciones">
-              <button type="button" class="btn-cancelar" id="cancelar-evento">Cancelar</button>
-              <button type="submit" class="btn-guardar">Guardar</button>
-            </div>
-          </form>
         </div>
       </div>
     </div>
@@ -403,10 +294,10 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Alternar visibilidad de secciones
+    // Alternar visibilidad de secciones (solo lectura para cliente)
     document.querySelectorAll('.btn-info').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevenir que se propague al window.click
+            e.stopPropagation();
             const seccion = btn.dataset.seccion;
             const tarjeta = document.getElementById(`tarjeta-${seccion}`);
             if (tarjeta) {
@@ -414,14 +305,6 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     });
-
-    // Obtener el ID del proceso
-    const procesoId = parseInt(document.getElementById('proceso-id').value, 10);
-    let eventosConEstado = [];
-    let documentosConEstado = [];
-    let mostrarTodos = false;
-    recargarEventos();
-    recargarDocumentos();
 
     // Función para mostrar mensajes
     function mostrarMensaje(mensaje, tipo) {
@@ -432,102 +315,9 @@ document.addEventListener("DOMContentLoaded", function() {
         setTimeout(() => messageDiv.remove(), 5000);
     }
 
-    // FUNCIONES PARA MODALES (definirlas en el scope global)
-    window.openEditModal = function(field, value) {
-        const modal = document.getElementById('modal-edit-info');
-        const container = document.getElementById('edit-field-container');
-        const hiddenField = document.getElementById('edit-field');
-        
-        hiddenField.value = field;
-        
-        // Limpiar y reconstruir el contenido del campo de edición
-        container.innerHTML = '';
-        
-        let labelText = '';
-        let inputType = 'text';
-        let inputValue = value || '';
-        
-        switch(field) {
-            case 'numeroProceso':
-                labelText = 'Número de Caso:';
-                inputType = 'text';
-                break;
-            case 'descripcion':
-                labelText = 'Descripción:';
-                // Para descripción usar textarea
-                container.innerHTML = `
-                    <label for="edit-value">${labelText}</label>
-                    <textarea id="edit-value" name="value" rows="4" required>${inputValue}</textarea>
-                `;
-                break;
-            case 'estado':
-                labelText = 'Estado:';
-                // Para estado usar select con opciones de Thymeleaf
-                container.innerHTML = `
-                    <label for="edit-value">${labelText}</label>
-                    <select id="edit-value" name="value" required>
-                        <option value="">Seleccione un estado</option>
-                        <!-- Las opciones se llenarán dinámicamente -->
-                    </select>
-                `;
-                // Llenar el select con estados disponibles
-                const estadosDisponibles = /*[[${estadosDisponibles}]]*/ [];
-                const select = container.querySelector('#edit-value');
-                estadosDisponibles.forEach(estado => {
-                    const option = document.createElement('option');
-                    option.value = estado.nombre;
-                    option.textContent = estado.nombre;
-                    option.selected = (estado.nombre === value);
-                    select.appendChild(option);
-                });
-                break;
-            case 'fechaInicio':
-                labelText = 'Fecha Inicio:';
-                inputType = 'date';
-                break;
-            default:
-                labelText = 'Editar:';
-        }
-
-        // Si no se construyó un campo especial, usar input normal
-        if (container.innerHTML === '') {
-            container.innerHTML = `
-                <label for="edit-value">${labelText}</label>
-                <input type="${inputType}" id="edit-value" name="value" value="${inputValue}" required>
-            `;
-        }
-        
-        modal.style.display = 'flex';
-    };
-
-    window.openAddUserModal = function() {
-        document.getElementById('modal-add-user').style.display = 'flex';
-    };
-
     window.closeModal = function(modalId) {
         document.getElementById(modalId).style.display = 'none';
     };
-
-    // Asignar eventos de clic a los items de información
-    document.querySelectorAll('.item-info').forEach(item => {
-        item.addEventListener('click', function() {
-            const field = this.getAttribute('onclick').match(/'(.*?)'/)[1];
-            const valueElement = this.querySelector('.valor-info');
-            const value = valueElement ? valueElement.textContent.trim() : '';
-            openEditModal(field, value);
-        });
-    });
-
-    // Event listeners para cerrar modales
-    document.querySelectorAll('.cerrar-modal, .btn-cancelar').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const modal = this.closest('.modal');
-            if (modal) {
-                modal.style.display = 'none';
-            }
-        });
-    });
 
     // Prevenir que los clics dentro del modal cierren el modal
     document.querySelectorAll('.modal .contenido-modal').forEach(modalContent => {
@@ -543,8 +333,9 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Recargar eventos
+    // Recargar eventos (solo lectura)
     function recargarEventos() {
+        const procesoId = parseInt(document.getElementById('proceso-id').value, 10);
         fetch(`/abogado/eventos-proceso/${procesoId}`)
             .then(response => response.json())
             .then(nuevosEventos => {
@@ -561,15 +352,16 @@ document.addEventListener("DOMContentLoaded", function() {
             .catch(error => mostrarMensaje('Error al cargar eventos', 'error'));
     }
 
-    // Actualizar lista de eventos
+    // Actualizar lista de eventos (solo lectura)
     function actualizarListaEventos() {
         const lista = document.getElementById('con-eventos');
         const sinEventos = document.getElementById('sin-eventos');
         const btnAntiguos = document.getElementById('ver-eventos-antiguos');
-        lista.innerHTML = ''; // Limpiar lista
+        lista.innerHTML = '';
         sinEventos.style.display = 'none';
 
         let eventosFiltrados = [...eventosConEstado].sort((a, b) => b.fechaEvento - a.fechaEvento);
+        let mostrarTodos = false;
 
         if (!mostrarTodos) {
             eventosFiltrados = eventosFiltrados.filter(e => e.estado === 'pendiente');
@@ -595,87 +387,17 @@ document.addEventListener("DOMContentLoaded", function() {
                         <i class="fas fa-clock"></i> <span>${evento.hora}</span>
                     </div>
                 </div>
-                <div class="acciones-evento">
-                    <button class="btn-editar-evento" data-id="${evento.id}"><i class="fas fa-edit"></i></button>
-                    <button class="btn-eliminar-evento" data-id="${evento.id}"><i class="fas fa-trash"></i></button>
-                </div>
             `;
             lista.appendChild(eventoDiv);
         });
     }
 
-    const btnActuales = document.getElementById('ver-eventos-actuales');
-
-    btnActuales.addEventListener('click', () => {
-        mostrarTodos = false;
-        btnActuales.style.display = 'none'
-        actualizarListaEventos();
-    });
-
-    // Event listener for ver-eventos-antiguos
     document.getElementById('ver-eventos-antiguos').addEventListener('click', () => {
         mostrarTodos = true;
-        btnActuales.style.display = 'block'
         actualizarListaEventos();
     });
 
-    // Event delegation for edit and delete events
-    document.getElementById('lista-eventos').addEventListener('click', (e) => {
-        if (e.target.closest('.btn-editar-evento')) {
-            const id = e.target.closest('.btn-editar-evento').dataset.id;
-            const evento = eventosConEstado.find(e => e.id == id);
-            if (evento) {
-                document.getElementById('titulo-modal-evento').textContent = 'Editar Evento';
-                document.getElementById('evento-id').value = evento.id;
-                document.getElementById('evento-tipo').value = evento.tipoEvento;
-                document.getElementById('evento-descripcion').value = evento.descripcion;
-                document.getElementById('evento-fecha').value = evento.fechaEvento.toISOString().slice(0, 16);
-                document.getElementById('modal-evento').style.display = 'flex';
-            }
-        } else if (e.target.closest('.btn-eliminar-evento')) {
-            const id = e.target.closest('.btn-eliminar-evento').dataset.id;
-            if (confirm('¿Está seguro de eliminar este evento?')) {
-                fetch(`/abogado/eliminar-evento/${id}`, { method: 'DELETE' })
-                    .then(response => {
-                        if (response.ok) {
-                            recargarEventos();
-                            mostrarMensaje('Evento eliminado', 'success');
-                        } else {
-                            mostrarMensaje('Error al eliminar evento', 'error');
-                        }
-                    });
-            }
-        }
-    });
-
-    // Event delegation for delete user
-    document.querySelector('.lista-personas').addEventListener('click', (e) => {
-        if (e.target.closest('.btn-eliminar-usuario')) {
-            const usuarioId = e.target.closest('.btn-eliminar-usuario').dataset.usuarioId;
-            if (confirm('¿Está seguro de eliminar este usuario del proceso?')) {
-                fetch(`/abogado/eliminar-usuario-proceso/${procesoId}/${usuarioId}`, { method: 'DELETE' })
-                    .then(response => {
-                        if (response.ok) {
-                            location.reload();
-                            mostrarMensaje('Usuario eliminado del proceso', 'success');
-                        } else {
-                            mostrarMensaje('Error al eliminar usuario', 'error');
-                        }
-                    });
-            }
-        }
-    });
-
-    // Recargar documentos
-    function recargarDocumentos() {
-        fetch(`/abogado/documentos-proceso/${procesoId}`)
-            .then(response => response.json())
-            .then(nuevosDocumentos => {
-                documentosConEstado = nuevosDocumentos;
-                // actualizarListaDocumentos(); // Si necesitas actualización dinámica
-            })
-            .catch(error => mostrarMensaje('Error al cargar documentos', 'error'));
-    }
+    recargarEventos();
 
     // Event delegation for edit and delete documents
     document.querySelector('.acordeon-documentos').addEventListener('click', (e) => {
@@ -715,16 +437,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Función para crear evento
-    document.getElementById('crear-evento').addEventListener('click', () => {
-        document.getElementById('titulo-modal-evento').textContent = 'Nuevo Evento';
-        document.getElementById('form-evento').reset();
-        const ahora = new Date();
-        ahora.setHours(ahora.getHours() + 1, 0, 0, 0);
-        document.getElementById('evento-fecha').value = ahora.toISOString().slice(0, 16);
-        document.getElementById('modal-evento').style.display = 'flex';
-    });
-
     // Función para subir documento
     document.getElementById('subir-documento').addEventListener('click', () => {
         document.getElementById('titulo-modal-documento').textContent = 'Subir Documento';
@@ -736,7 +448,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // Submit forms con fetch y mostrar mensaje
-    document.querySelectorAll('#form-edit-info, #form-add-user, #form-evento, #form-documento').forEach(form => {
+    document.querySelectorAll('#form-documento').forEach(form => {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const formData = new FormData(form);
@@ -749,13 +461,7 @@ document.addEventListener("DOMContentLoaded", function() {
             })
                 .then(response => {
                     if (response.ok) {
-                        if (form.id === 'form-evento') {
-                            recargarEventos();
-                        } else if (form.id === 'form-documento') {
-                            location.reload();
-                        } else {
-                            location.reload();
-                        }
+                        location.reload();
                         mostrarMensaje('Guardado correctamente', 'success');
                         form.closest('.modal').style.display = 'none';
                     } else {
@@ -766,9 +472,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
-</script>
 
-<script>
 let stompClient = null;
 const procesoId = parseInt(document.getElementById('proceso-id').value, 10);
 const usuarioActualId = parseInt(document.getElementById('id-usuario').value, 10);
@@ -996,6 +700,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
 window.addEventListener('beforeunload', disconnectWebSocket);
 </script>
-
 </body>
 </html>

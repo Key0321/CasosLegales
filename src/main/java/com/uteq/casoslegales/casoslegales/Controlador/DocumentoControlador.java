@@ -16,10 +16,15 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -172,6 +177,73 @@ public class DocumentoControlador {
 
         return "admin/gestion_documentos";
     }
+
+    @GetMapping("/abogado/documentos")
+    public String listarDocumentos(@RequestParam(defaultValue = "0") int pagina,
+                                @RequestParam(defaultValue = "10") int tamano,
+                                @RequestParam(required = false) String busqueda,
+                                @RequestParam(required = false) Long proceso,
+                                @RequestParam(required = false) Integer anio,
+                                @RequestParam(required = false) String tipo,
+                                HttpSession session, 
+                                Model model) {
+        // Obtener usuario de la sesión
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        // Obtener procesos asociados al usuario
+        List<ProcesoLegal> procesosUsuario = procesoServicio.listarPorUsuario(usuario.getId());
+        List<Long> procesoIds = procesosUsuario.stream()
+                .map(ProcesoLegal::getId)
+                .collect(Collectors.toList());
+
+        // Filtrar documentos por procesos del usuario y otros filtros
+        Page<Documento> paginaDocumentos = documentoServicio.listarPaginadosConFiltrosPorUsuario(
+                busqueda, proceso, anio, tipo, procesoIds, pagina, tamano);
+
+        // Obtener valores únicos para filtros, restringidos a procesos del usuario
+        List<ProcesoLegal> procesosUnicos = documentoServicio.obtenerProcesosConDocumentosPorUsuario(procesoIds);
+        List<Integer> aniosUnicos = documentoServicio.obtenerAniosDocumentosPorUsuario(procesoIds);
+        List<String> tiposUnicos = documentoServicio.obtenerTiposDocumentosPorUsuario(procesoIds);
+
+        model.addAttribute("documentos", paginaDocumentos.getContent());
+        model.addAttribute("procesosUnicos", procesosUnicos);
+        model.addAttribute("aniosUnicos", aniosUnicos);
+        model.addAttribute("tiposUnicos", tiposUnicos);
+        model.addAttribute("paginaActual", pagina);
+        model.addAttribute("totalPaginas", paginaDocumentos.getTotalPages());
+        model.addAttribute("totalElementos", paginaDocumentos.getTotalElements());
+        model.addAttribute("filtroBusqueda", busqueda);
+        model.addAttribute("filtroProceso", proceso);
+        model.addAttribute("filtroAnio", anio);
+        model.addAttribute("filtroTipo", tipo);
+        model.addAttribute("usuarioActual", usuario);
+
+        return "abogado/documentos";
+    }
+
+    @GetMapping("/ver/documentos/{nombreArchivo:.+}")
+    @ResponseBody
+    public ResponseEntity<Resource> verDocumento(@PathVariable String nombreArchivo) {
+        try {
+            Path filePath = Paths.get("uploads/documentos").resolve(nombreArchivo).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (!resource.exists()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                    .body(resource);
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }    
 
     @DeleteMapping("/eliminar_documento/{id}")
     public ResponseEntity<?> eliminarProceso(@PathVariable Long id) {

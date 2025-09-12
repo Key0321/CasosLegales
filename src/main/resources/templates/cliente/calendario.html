@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calendario - Sistema Legal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/abogado/abogado_menu.css">
+    <link rel="stylesheet" href="/css/abogado/calendario.css">
+</head>
+<body>
+    <!-- Menú Lateral -->
+    <div class="menu">
+      <div class="menu-logo">
+          <img th:src="@{/imagenes/logo.png}" alt="Inicio" />
+      </div>
+      <div class="menu-item" th:onclick="|window.location.href='@{/cliente/inicio}'|">
+          <img th:src="@{/imagenes/casos.png}" alt="Mis casos" />
+      </div>
+      <div class="menu-item activo" th:onclick="|window.location.href='@{/cliente/calendario}'|">
+          <img th:src="@{/imagenes/calendario.png}" alt="Calendar" />
+      </div>
+      <div class="menu-item" th:onclick="|window.location.href='@{/cliente/ajustes}'|">
+          <img th:src="@{/imagenes/ajustes.png}" alt="Ajustes" />
+      </div>
+    </div>
+
+    <!-- Encabezado -->
+    <div class="encabezado">
+        <div class="encabezado-buscar">
+            <div class="div-buscar">
+                <div class="div-img-buscar">
+                    <img src="https://img.icons8.com/ios-glyphs/20/999999/search--v1.png" class="img-buscar" alt="Buscar" />
+                </div>
+                <div class="div-input-buscar">
+                    <input type="text" placeholder="Buscar eventos..." class="input-buscar" id="buscarEventos" />
+                </div>
+            </div>
+        </div>
+        <div class="encabezado-botones">
+            <div class="menu-item item-notificacion">
+                <img th:src="@{/imagenes/notificaciones.png}" alt="Notificacion" />
+            </div>
+            <div class="menu-item item-perfil">
+                <span th:text="${#strings.substring(usuarioActual.nombre, 0, 1) + #strings.substring(usuarioActual.apellido, 0, 1)}">US</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensajes de éxito o error -->
+    <div th:if="${param.success}" class="message success" th:text="${param.success}"></div>
+    <div th:if="${param.error}" class="message error" th:text="${param.error}"></div>
+
+    <div class="div-contenido">
+        <div class="contenido-principal">
+            <!-- Sección de Calendario (Izquierda) -->
+            <div class="seccion-calendario">
+                <div class="cabecera-calendario">
+                    <div class="info-cabecera-calendario">
+                        <h2>Calendario - <span id="mes-ano"></span></h2>
+                    </div>
+                    <div class="navegacion-calendario">
+                        <button id="prev-mes" class="btn-navegacion"><i class="fas fa-chevron-left"></i></button>
+                        <button id="hoy" class="btn-hoy">Hoy</button>
+                        <button id="next-mes" class="btn-navegacion"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                
+                <div class="calendario-grande" id="calendario-grande">
+                    <div class="cabecera-semana">
+                        <div class="dia-semana">Lun</div>
+                        <div class="dia-semana">Mar</div>
+                        <div class="dia-semana">Mié</div>
+                        <div class="dia-semana">Jue</div>
+                        <div class="dia-semana">Vie</div>
+                        <div class="dia-semana">Sáb</div>
+                        <div class="dia-semana">Dom</div>
+                    </div>
+                    <div class="dias-calendario" id="dias-calendario"></div>
+                </div>
+            </div>
+
+            <!-- Sección de Detalles (Derecha) -->
+            <div class="seccion-detalles">
+                <div class="cabecera-detalles">
+                    <h3>Próximos Eventos</h3>
+                </div>
+                
+                <div class="filtro-contenedor">
+                    <h4>Filtrar eventos</h4>
+                    <div class="filtro-opciones">
+                        <div class="filtro-grupo">
+                            <label for="filtro-estado">Estado:</label>
+                            <select id="filtro-estado" class="filtro-select">
+                                <option value="todos">Todos</option>
+                                <option value="pendientes">Pendientes</option>
+                                <option value="terminados">Terminados</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filtro-grupo">
+                            <label for="fecha-inicio">Desde:</label>
+                            <input type="date" id="fecha-inicio" class="filtro-fecha">
+                        </div>
+                        
+                        <div class="filtro-grupo">
+                            <label for="fecha-fin">Hasta:</label>
+                            <input type="date" id="fecha-fin" class="filtro-fecha">
+                        </div>
+                        
+                        <button id="aplicar-filtro" class="btn-filtro">Aplicar</button>
+                        <button id="limpiar-filtro" class="btn-filtro btn-secundario">Limpiar</button>
+                    </div>
+                </div>
+                
+                <div class="lista-eventos" id="lista-eventos">
+                    <div class="sin-eventos" id="sin-eventos">
+                        <i class="fas fa-calendar-day"></i>
+                        <p>No hay eventos para mostrar</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para eventos -->
+    <div id="modal-evento" class="modal">
+        <div class="contenido-modal">
+            <div class="cabecera-modal">
+                <h2 id="titulo-modal">Eventos del Día</h2>
+                <button class="cerrar-modal" aria-label="Cerrar"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="cuerpo-modal">
+                <div id="lista-eventos-modal"></div>
+                <form id="form-evento" th:action="@{/abogado/guardar-evento}" method="post">
+                    <input type="hidden" id="evento-id" name="id">
+                    <div class="form-grupo">
+                        <label for="evento-proceso">Proceso:</label>
+                        <select id="evento-proceso" name="proceso.id" required>
+                            <option value="">Seleccione un proceso</option>
+                            <!-- Opciones cargadas dinámicamente -->
+                        </select>
+                    </div>
+                    <div class="form-grupo">
+                        <label for="evento-titulo">Título del evento:</label>
+                        <input type="text" id="evento-titulo" name="tipoEvento" placeholder="Ingrese el título" required>
+                    </div>
+                    <div class="form-grupo">
+                        <label for="evento-descripcion">Descripción:</label>
+                        <textarea id="evento-descripcion" name="descripcion" placeholder="Ingrese la descripción" rows="3"></textarea>
+                    </div>
+                    <div class="form-grupo">
+                        <label for="evento-fecha">Fecha y hora:</label>
+                        <input type="datetime-local" id="evento-fecha" name="fechaEvento" required>
+                    </div>
+                    <div class="modal-acciones">
+                        <button type="button" class="btn-cancelar" id="cancelar-evento">Cancelar</button>
+                        <button type="submit" class="btn-guardar">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .message {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+
+    <script>
+/*<![CDATA[*/
+document.addEventListener("DOMContentLoaded", function() {
+    const usuarioActual = /*[[${usuarioActual}]]*/ null;
+    const now = new Date(/*[[${now}]]*/);
+    const currentYearFromServer = /*[[${currentYear}]]*/ now.getFullYear();
+    const currentMonthFromServer = /*[[${currentMonth}]]*/ now.getMonth();
+    let currentMonth = currentMonthFromServer;
+    let currentYear = currentYearFromServer;
+    let eventosConEstado = [];
+
+    // Mostrar mensajes de éxito o error desde la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const success = urlParams.get('success');
+    const error = urlParams.get('error');
+    
+    if (success || error) {
+        mostrarMensaje(decodeURIComponent(success || error), success ? 'success' : 'error');
+    }
+
+    function convertirLocalDateTimeADate(localDateTimeStr) {
+        if (!localDateTimeStr) return new Date();
+        // Formato esperado: "2025-08-29T10:30:00"
+        const [datePart, timePart] = localDateTimeStr.split('T');
+        const [year, month, day] = datePart.split('-').map(Number);
+        const [hours, minutes, seconds] = timePart.split(':').map(Number);
+        return new Date(year, month - 1, day, hours, minutes, seconds);
+    }
+
+    // Función para mostrar mensajes
+    function mostrarMensaje(mensaje, tipo) {
+        // Eliminar mensajes existentes
+        document.querySelectorAll('.message').forEach(msg => msg.remove());
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${tipo}`;
+        messageDiv.textContent = mensaje;
+        
+        document.querySelector('.div-contenido').insertBefore(
+            messageDiv, 
+            document.querySelector('.contenido-principal')
+        );
+        
+        setTimeout(() => messageDiv.remove(), 5000);
+    }
+
+    // Recargar eventos desde el servidor
+    function recargarEventos() {
+        fetch('/abogado/eventos')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(nuevosEventos => {
+            eventosConEstado = nuevosEventos.map(evento => {
+                // Convertir LocalDateTime a Date object
+                const fechaEvento = convertirLocalDateTimeADate(evento.fechaEvento);
+                return {
+                    id: evento.id,
+                    procesoId: evento.procesoId,
+                    tipoEvento: evento.tipoEvento,
+                    descripcion: evento.descripcion,
+                    fechaEvento: fechaEvento,
+                    estado: fechaEvento < new Date() ? 'terminado' : 'pendiente',
+                    hora: fechaEvento.toLocaleTimeString('es-ES', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    })
+                };
+            });
+            
+            generarCalendario(currentMonth, currentYear);
+            actualizarListaEventos();
+        })
+        .catch(error => {
+            console.error('Error al recargar eventos:', error);
+            mostrarMensaje('Error al cargar los eventos', 'error');
+        });
+    }
+
+    // Generar calendario
+    function generarCalendario(mes, ano) {
+        const nombresMeses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        document.getElementById('mes-ano').textContent = `${nombresMeses[mes]} ${ano}`;
+        
+        const diasContenedor = document.getElementById('dias-calendario');
+        diasContenedor.innerHTML = '';
+        
+        const primerDia = new Date(ano, mes, 1).getDay();
+        const ultimoDia = new Date(ano, mes + 1, 0).getDate();
+        let diaInicialAjustado = primerDia === 0 ? 6 : primerDia - 1;
+        const ultimoDiaMesAnterior = new Date(ano, mes, 0).getDate();
+
+        // Días del mes anterior
+        for (let i = 0; i < diaInicialAjustado; i++) {
+            const diaVacio = document.createElement('div');
+            diaVacio.classList.add('dia', 'dia-vacio');
+            diaVacio.textContent = ultimoDiaMesAnterior - (diaInicialAjustado - i - 1);
+            diasContenedor.appendChild(diaVacio);
+        }
+
+        const hoy = new Date();
+        
+        // Días del mes actual
+        for (let dia = 1; dia <= ultimoDia; dia++) {
+            const elementoDia = document.createElement('div');
+            elementoDia.classList.add('dia');
+            const fechaCompleta = new Date(ano, mes, dia);
+            elementoDia.dataset.fecha = `${ano}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+            
+            if (fechaCompleta.toDateString() === hoy.toDateString()) {
+                elementoDia.classList.add('dia-actual');
+            }
+
+            const numeroDia = document.createElement('div');
+            numeroDia.classList.add('numero-dia');
+            numeroDia.textContent = dia;
+            elementoDia.appendChild(numeroDia);
+
+            const eventosDia = eventosConEstado.filter(e => 
+                e.fechaEvento.toISOString().split('T')[0] === elementoDia.dataset.fecha
+            );
+
+            if (eventosDia.length > 0) {
+                const contenedorEventos = document.createElement('div');
+                contenedorEventos.classList.add('eventos-dia');
+                
+                eventosDia.forEach((evento, index) => {
+                    if (index < 2) {
+                        const eventoDiv = document.createElement('div');
+                        eventoDiv.classList.add('evento-calendario', evento.estado);
+                        eventoDiv.textContent = evento.tipoEvento.substring(0, 15) + (evento.tipoEvento.length > 15 ? '...' : '');
+                        contenedorEventos.appendChild(eventoDiv);
+                    }
+                });
+
+                if (eventosDia.length > 2) {
+                    const moreDiv = document.createElement('div');
+                    moreDiv.classList.add('evento-calendario', 'evento-mas');
+                    moreDiv.textContent = `+${eventosDia.length - 2} más`;
+                    contenedorEventos.appendChild(moreDiv);
+                }
+                
+                elementoDia.appendChild(contenedorEventos);
+            }
+
+            elementoDia.addEventListener('click', () => mostrarModalEventos(elementoDia.dataset.fecha));
+            diasContenedor.appendChild(elementoDia);
+        }
+
+        const diasVisibles = diaInicialAjustado + ultimoDia;
+        const diasRestantes = 42 - diasVisibles;
+        
+        // Días del mes siguiente
+        for (let i = 1; i <= diasRestantes; i++) {
+            const diaVacio = document.createElement('div');
+            diaVacio.classList.add('dia', 'dia-vacio');
+            diaVacio.textContent = i;
+            diasContenedor.appendChild(diaVacio);
+        }
+    }
+
+    // Mostrar modal con eventos del día
+    function mostrarModalEventos(fecha) {
+        const eventosDia = eventosConEstado.filter(e => 
+            e.fechaEvento.toISOString().split('T')[0] === fecha
+        );
+        
+        const listaModal = document.getElementById('lista-eventos-modal');
+        listaModal.innerHTML = '';
+        
+        const [year, month, day] = fecha.split('-').map(Number);
+        const fechaObj = new Date(year, month - 1, day);
+        const fechaFormateada = fechaObj.toLocaleDateString('es-ES', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        
+        document.getElementById('titulo-modal').textContent = `Eventos del ${fechaFormateada}`;
+        
+        if (eventosDia.length === 0) {
+            listaModal.innerHTML = '<div class="sin-eventos-modal"><i class="fas fa-calendar-plus"></i><p>No hay eventos programados para este día</p></div>';
+        } else {
+            eventosDia.forEach(evento => {
+                const eventoDiv = document.createElement('div');
+                eventoDiv.classList.add('item-evento-modal');
+                eventoDiv.innerHTML = `
+                    <div class="info-evento">
+                        <h4>${evento.tipoEvento}</h4>
+                        <p>${evento.descripcion || 'Sin descripción'}</p>
+                        <div class="fecha-evento-modal">
+                            <i class="fas fa-clock"></i>
+                            <span>${evento.hora}</span>
+                        </div>
+                    </div>
+                    <div class="acciones-evento">
+                        <button class="btn-editar" data-id="${evento.id}"><i class="fas fa-edit"></i></button>
+                        <button class="btn-eliminar" data-id="${evento.id}"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+                listaModal.appendChild(eventoDiv);
+            });
+        }
+        
+        document.getElementById('modal-evento').style.display = 'flex';
+        document.getElementById('form-evento').style.display = 'none';
+    }
+
+    // Cerrar modal
+    function cerrarModal() {
+        document.getElementById('modal-evento').style.display = 'none';
+    }
+
+    document.querySelector('.cerrar-modal').addEventListener('click', cerrarModal);
+    document.getElementById('cancelar-evento').addEventListener('click', cerrarModal);
+
+    // Navegación de meses
+    document.getElementById('prev-mes').addEventListener('click', () => {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        generarCalendario(currentMonth, currentYear);
+        actualizarListaEventos();
+    });
+
+    document.getElementById('next-mes').addEventListener('click', () => {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        generarCalendario(currentMonth, currentYear);
+        actualizarListaEventos();
+    });
+
+    document.getElementById('hoy').addEventListener('click', () => {
+        const hoy = new Date();
+        currentMonth = hoy.getMonth();
+        currentYear = hoy.getFullYear();
+        generarCalendario(currentMonth, currentYear);
+        actualizarListaEventos();
+    });
+
+    // Cargar procesos para el formulario
+    function cargarProcesos(selectElement, selectedId = null) {
+        fetch('/Audiencia/listar_mis_procesos_legales')
+        .then(response => {
+            if (!response.ok) throw new Error('Error al cargar procesos');
+            return response.json();
+        })
+        .then(procesos => {
+            selectElement.innerHTML = '<option value="">Seleccione un proceso</option>';
+            procesos.forEach(proceso => {
+                const option = document.createElement('option');
+                option.value = proceso[0];
+                option.textContent = `${proceso[1]} - ${proceso[2]}`;
+                if (selectedId && proceso[0] == selectedId) {
+                    option.selected = true;
+                }
+                selectElement.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Error al cargar procesos:', error);
+            mostrarMensaje('Error al cargar los procesos', 'error');
+        });
+    }
+
+
+    // Editar o eliminar evento
+    document.getElementById('lista-eventos-modal').addEventListener('click', (e) => {
+        if (e.target.closest('.btn-editar')) {
+            const id = e.target.closest('.btn-editar').dataset.id;
+            const evento = eventosConEstado.find(e => e.id == id);
+            
+            if (evento) {
+                document.getElementById('titulo-modal').textContent = 'Editar Evento';
+                document.getElementById('lista-eventos-modal').innerHTML = '';
+                document.getElementById('form-evento').style.display = 'block';
+                
+                document.getElementById('evento-id').value = id;
+                document.getElementById('evento-titulo').value = evento.tipoEvento;
+                document.getElementById('evento-descripcion').value = evento.descripcion || '';
+                document.getElementById('evento-fecha').value = evento.fechaEvento.toISOString().slice(0, 16);
+                
+                cargarProcesos(document.getElementById('evento-proceso'), evento.procesoId);
+            }
+        } else if (e.target.closest('.btn-eliminar')) {
+            const id = e.target.closest('.btn-eliminar').dataset.id;
+            if (confirm('¿Está seguro de que desea eliminar este evento?')) {
+                fetch(`/eliminar-evento/${id}`, { 
+                    method: 'DELETE' 
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(text || 'Error al eliminar el evento');
+                        });
+                    }
+                    return response.text();
+                })
+                .then(() => {
+                    recargarEventos();
+                    cerrarModal();
+                    mostrarMensaje('Evento eliminado correctamente', 'success');
+                })
+                .catch(error => {
+                    console.error('Error al eliminar:', error);
+                    mostrarMensaje('Error al eliminar el evento', 'error');
+                });
+            }
+        }
+    });
+
+    // Enviar formulario
+    document.getElementById('form-evento').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = this;
+        
+        fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(text || 'Error al guardar el evento');
+                });
+            }
+            return response.text();
+        })
+        .then(result => {
+            recargarEventos();
+            cerrarModal();
+            mostrarMensaje('Evento guardado correctamente', 'success');
+        })
+        .catch(error => {
+            console.error('Error al guardar el evento:', error);
+            
+            let errorMessage = 'Error al guardar el evento';
+            if (error.message.includes('procesoId')) {
+                errorMessage = 'Debe seleccionar un proceso válido';
+            } else if (error.message.includes('asociado')) {
+                errorMessage = 'El proceso seleccionado no está asociado a su usuario';
+            }
+            
+            mostrarMensaje(errorMessage, 'error');
+        });
+    });
+
+    // Actualizar lista de eventos - CORREGIDO
+    function actualizarListaEventos(filtro = 'todos', fechaInicio = '', fechaFin = '', searchTerm = '') {
+        const lista = document.getElementById('lista-eventos');
+        const sinEventos = document.getElementById('sin-eventos');
+        lista.innerHTML = '';
+        sinEventos.style.display = 'none';
+
+        let eventosFiltrados = [...eventosConEstado].sort((a, b) => a.fechaEvento - b.fechaEvento);
+
+        // Filtrar por estado
+        if (filtro === 'pendientes') {
+            eventosFiltrados = eventosFiltrados.filter(e => e.estado === 'pendiente');
+        } else if (filtro === 'terminados') {
+            eventosFiltrados = eventosFiltrados.filter(e => e.estado === 'terminado');
+        }
+
+        // Filtrar por fecha - CORREGIDO
+        if (fechaInicio) {
+            const inicioDate = new Date(fechaInicio);
+            inicioDate.setHours(0, 0, 0, 0);
+            eventosFiltrados = eventosFiltrados.filter(e => {
+                const eventoDate = new Date(e.fechaEvento);
+                eventoDate.setHours(0, 0, 0, 0);
+                return eventoDate >= inicioDate;
+            });
+        }
+
+        if (fechaFin) {
+            const finDate = new Date(fechaFin);
+            finDate.setHours(23, 59, 59, 999);
+            eventosFiltrados = eventosFiltrados.filter(e => {
+                const eventoDate = new Date(e.fechaEvento);
+                return eventoDate <= finDate;
+            });
+        }
+
+        // Filtrar por búsqueda
+        if (searchTerm) {
+            eventosFiltrados = eventosFiltrados.filter(e => 
+                e.tipoEvento.toLowerCase().includes(searchTerm) || 
+                (e.descripcion && e.descripcion.toLowerCase().includes(searchTerm))
+            );
+        }
+
+        if (eventosFiltrados.length === 0) {
+            sinEventos.style.display = 'flex';
+            return;
+        }
+
+        // Mostrar eventos filtrados
+        eventosFiltrados.forEach(evento => {
+            const eventoDiv = document.createElement('div');
+            eventoDiv.classList.add('item-evento', evento.estado);
+            eventoDiv.innerHTML = `
+                <div class="estado-evento ${evento.estado}"></div>
+                <div class="contenido-evento">
+                    <h4 class="evento-titulo">${evento.tipoEvento}</h4>
+                    <p class="evento-descripcion">${evento.descripcion || 'Sin descripción'}</p>
+                    <div class="evento-fecha">
+                        <i class="fas fa-calendar"></i>
+                        <span>${evento.fechaEvento.toLocaleDateString('es-ES')}</span>
+                        <i class="fas fa-clock"></i>
+                        <span>${evento.hora}</span>
+                    </div>
+                </div>
+            `;
+            lista.appendChild(eventoDiv);
+        });
+    }
+
+    // Eventos de filtro
+    document.getElementById('aplicar-filtro').addEventListener('click', () => {
+        const filtro = document.getElementById('filtro-estado').value;
+        const fechaInicio = document.getElementById('fecha-inicio').value;
+        const fechaFin = document.getElementById('fecha-fin').value;
+        
+        // Validar que si hay fecha fin, también haya fecha inicio
+        if (fechaFin && !fechaInicio) {
+            mostrarMensaje('Debe seleccionar una fecha de inicio', 'error');
+            return;
+        }
+        
+        actualizarListaEventos(filtro, fechaInicio, fechaFin);
+    });
+
+    document.getElementById('limpiar-filtro').addEventListener('click', () => {
+        document.getElementById('filtro-estado').value = 'todos';
+        document.getElementById('fecha-inicio').value = '';
+        document.getElementById('fecha-fin').value = '';
+        document.getElementById('buscarEventos').value = '';
+        
+        actualizarListaEventos();
+    });
+
+    document.getElementById('filtro-estado').addEventListener('change', () => {
+        const filtro = document.getElementById('filtro-estado').value;
+        actualizarListaEventos(filtro);
+    });
+
+    // Buscar eventos
+    document.getElementById('buscarEventos').addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        actualizarListaEventos('todos', '', '', searchTerm);
+    });
+
+    // Inicializar
+    recargarEventos();
+
+    // También puedes mantener los eventos iniciales del modelo como respaldo
+    const eventosIniciales = /*[[${eventos}]]*/ [];
+    if (eventosIniciales && eventosIniciales.length > 0) {
+        eventosConEstado = eventosIniciales.map(evento => ({
+            id: evento.id,
+            procesoId: evento.proceso ? evento.proceso.id : null,
+            tipoEvento: evento.tipoEvento,
+            descripcion: evento.descripcion,
+            fechaEvento: new Date(evento.fechaEvento),
+            estado: new Date(evento.fechaEvento) < new Date() ? 'terminado' : 'pendiente',
+            hora: new Date(evento.fechaEvento).toLocaleTimeString('es-ES', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            })
+        }));
+        generarCalendario(currentMonth, currentYear);
+        actualizarListaEventos();
+    }
+});
+/*]]>*/
+</script>
+</body>
+</html>

@@ -1,11 +1,16 @@
 package com.uteq.casoslegales.casoslegales.Servicio;
 
 import com.uteq.casoslegales.casoslegales.Modelo.Documento;
+import com.uteq.casoslegales.casoslegales.Modelo.ProcesoLegal;
 import com.uteq.casoslegales.casoslegales.Modelo.Usuario;
 import com.uteq.casoslegales.casoslegales.Repositorio.DocumentoRepositorio;
+
+import jakarta.persistence.criteria.Predicate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -140,6 +145,45 @@ public class DocumentoServicio {
 
         // Devolver ruta completa
         return "/documentos/" + nombreArchivo;
+    }
+
+    public Page<Documento> listarPaginadosConFiltrosPorUsuario(String busqueda, Long proceso, Integer anio, String tipo, List<Long> procesoIds, int pagina, int tamano) {
+    Specification<Documento> spec = (root, query, cb) -> {
+        List<Predicate> predicates = new ArrayList<>();
+        // Filtrar por procesos del usuario
+        predicates.add(root.get("proceso").get("id").in(procesoIds));
+        // Otros filtros
+        if (busqueda != null && !busqueda.isEmpty()) {
+            String busquedaLower = "%" + busqueda.toLowerCase() + "%";
+            predicates.add(cb.or(
+                    cb.like(cb.lower(root.get("nombre")), busquedaLower),
+                    cb.like(cb.lower(root.get("palabrasClave")), busquedaLower)
+            ));
+        }
+        if (proceso != null) {
+            predicates.add(cb.equal(root.get("proceso").get("id"), proceso));
+        }
+        if (anio != null) {
+            predicates.add(cb.equal(root.get("anio"), anio));
+        }
+        if (tipo != null && !tipo.isEmpty()) {
+            predicates.add(cb.equal(root.get("tipoDocumento"), tipo));
+        }
+        return cb.and(predicates.toArray(new Predicate[0]));
+    };
+    return documentoRepo.findAll(spec, PageRequest.of(pagina, tamano));
+}
+
+    public List<ProcesoLegal> obtenerProcesosConDocumentosPorUsuario(List<Long> procesoIds) {
+        return documentoRepo.findDistinctProcesosByProcesoIds(procesoIds);
+    }
+
+    public List<Integer> obtenerAniosDocumentosPorUsuario(List<Long> procesoIds) {
+        return documentoRepo.findDistinctAniosByProcesoIds(procesoIds);
+    }
+
+    public List<String> obtenerTiposDocumentosPorUsuario(List<Long> procesoIds) {
+        return documentoRepo.findDistinctTiposByProcesoIds(procesoIds);
     }
 
 }
