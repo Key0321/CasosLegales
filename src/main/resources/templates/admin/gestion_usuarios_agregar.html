@@ -107,15 +107,15 @@
     <!-- Formulario de creación -->
     <form class="formulario-caso" th:action="@{/admin/guardar_usuario}" th:object="${usuario}" method="post" id="usuarioForm">
 
-      <div class="form-grupo">
+    <div class="form-grupo">
         <label>Nombre</label>
         <input type="text" th:field="*{nombre}" required />
-      </div>
+    </div>
 
-      <div class="form-grupo">
+    <div class="form-grupo">
         <label>Apellido</label>
         <input type="text" th:field="*{apellido}" required />
-      </div>
+    </div>
 
     <div class="form-grupo">
         <label>Tipo de identificación</label>
@@ -133,51 +133,30 @@
         <small id="identificacionHelp" style="color: gray;"></small>
     </div>
 
-      <div class="form-grupo">
+    <div class="form-grupo">
         <label>Correo</label>
         <input type="email" th:field="*{correo}" required />
-      </div>
+    </div>
 
-      <div class="form-grupo">
-        <label>Contraseña</label>
-        <div class="password-container">
-            <input type="password" th:field="*{contrasenia}" id="contraseña" required />
-            <button type="button" class="toggle-password" onclick="togglePassword('contraseña')">
-                👁️
-            </button>
-        </div>
-      </div>
-
-      <div class="form-grupo">
-        <label>Confirmar Contraseña</label>
-        <div class="password-container">
-            <input type="password" id="confirmarContrasenia" name="confirmarContrasenia" required />
-            <button type="button" class="toggle-password" onclick="togglePassword('confirmarContrasenia')">
-                👁️
-            </button>
-        </div>
-        <small id="passwordError" style="color: red; display: none;">Las contraseñas no coinciden</small>
-      </div>
-
-      <div class="form-grupo">
+    <div class="form-grupo">
         <label>Teléfono</label>
         <input type="text" th:field="*{telefono}" required />
-      </div>
+    </div>
 
-      <div class="form-grupo">
+    <div class="form-grupo">
         <label>Rol</label>
         <select th:field="*{rol.id}" required>
-          <option value="">Seleccione un rol</option>
-          <option th:each="rol : ${roles}" 
-                  th:value="${rol.id}" 
-                  th:text="${rol.nombre}">
-          </option>
+        <option value="">Seleccione un rol</option>
+        <option th:each="rol : ${roles}" 
+                th:value="${rol.id}" 
+                th:text="${rol.nombre}">
+        </option>
         </select>
-      </div>
+    </div>
 
-      <div class="form-grupo">
+    <div class="form-grupo">
         <button type="submit" class="dt-btn-agregar">Guardar usuario</button>
-      </div>
+    </div>
 
     </form>
 </div>

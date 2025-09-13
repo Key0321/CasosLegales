@@ -1,22 +1,25 @@
 package com.uteq.casoslegales.casoslegales.Servicio;
 
-import java.util.ArrayList;
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.Predicate;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.mail.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Propagation;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.uteq.casoslegales.casoslegales.Modelo.Usuario;
 import com.uteq.casoslegales.casoslegales.Repositorio.ProcesoUsuarioRepositorio;
@@ -34,6 +37,9 @@ public class UsuarioServicio {
 
     @Autowired
     private ProcesoUsuarioRepositorio procesoUsuarioRepositorio;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Optional<Usuario> autenticar(String correo, String contrasenia) {
@@ -112,6 +118,56 @@ public class UsuarioServicio {
             return usuarioRepo.findByCreadorIdAndBusqueda(creadorId, busqueda, pageable);
         } else {
             return usuarioRepo.findByCreadoPor_Id(creadorId, pageable);
+        }
+    }
+
+    public String generarContraseniaAleatoria() {
+        String caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+        SecureRandom random = new SecureRandom();
+        StringBuilder contrasenia = new StringBuilder();
+
+        for (int i = 0; i < 12; i++) {
+            int index = random.nextInt(caracteres.length());
+            contrasenia.append(caracteres.charAt(index));
+        }
+        return contrasenia.toString();
+    }
+
+    public boolean existeContrasenia(String contrasenia) {
+        String contraseniaEncriptada = passwordEncoder.encode(contrasenia);
+        Integer count = jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM usuarios WHERE contrasenia = ?", Integer.class, contraseniaEncriptada);
+        return count != null && count > 0;
+    }
+
+    public void enviarCorreoRegistro(String correoDestino, String contrasenia) throws MessagingException {
+        String remitente = "kbedonv@uteq.edu.ec"; // Reemplaza con tu correo
+        String contraseniaRemitente = "gxvm oryp sexd nfqc"; // Reemplaza con tu contraseña de aplicación
+
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+
+        Session session = Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(remitente, contraseniaRemitente);
+            }
+        });
+
+        try {
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(remitente));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(correoDestino));
+            message.setSubject("Registro Exitoso - Nueva Contraseña");
+            message.setText("Hola,\n\nTu cuenta ha sido creada exitosamente. Usa la siguiente contraseña para acceder al sistema:\n\nContraseña: " + contrasenia + "\n\nPor favor, cámbiala al iniciar sesión por seguridad.\n\nSaludos,\nEl equipo de soporte");
+            Transport.send(message);
+        } catch (AddressException e) {
+            throw new MessagingException("Error en el formato de la dirección de correo: " + e.getMessage(), e);
+        } catch (MessagingException e) {
+            throw new MessagingException("Error al procesar o enviar el correo: " + e.getMessage(), e);
         }
     }
 

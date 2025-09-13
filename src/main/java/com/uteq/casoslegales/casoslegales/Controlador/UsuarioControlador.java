@@ -30,6 +30,8 @@ import com.uteq.casoslegales.casoslegales.Servicio.AccesoServicio;
 import com.uteq.casoslegales.casoslegales.Servicio.RolServicio;
 import com.uteq.casoslegales.casoslegales.Servicio.UsuarioServicio;
 
+import javax.mail.*;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
@@ -166,25 +168,24 @@ public class UsuarioControlador {
     }
 
     @PostMapping({"/admin/guardar_usuario"})
-     public String guardarUsuario(
+    public String guardarUsuario(
             @ModelAttribute Usuario usuario,
-            @RequestParam("confirmarContrasenia") String confirmarContrasenia,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
         Usuario usuarioSesion = (Usuario) session.getAttribute("usuario");
 
         try {
-            // Validar que las contraseñas coincidan
-            if (!usuario.getContrasenia().equals(confirmarContrasenia)) {
-                redirectAttributes.addFlashAttribute("error", "Las contraseñas no coinciden");
-                return "redirect:/admin/gestion_usuarios_agregar";
-            }
-
             LocalDateTime fechaActual = LocalDateTime.now();
 
-            // Encriptar la contraseña antes de guardarla
-            String contraseniaEncriptada = passwordEncoder.encode(usuario.getContrasenia());
+            // Generar contraseña aleatoria
+            String nuevaContrasenia = usuarioServicio.generarContraseniaAleatoria();
+            while (usuarioServicio.existeContrasenia(nuevaContrasenia)) {
+                nuevaContrasenia = usuarioServicio.generarContraseniaAleatoria();
+            }
+
+            // Encriptar la contraseña
+            String contraseniaEncriptada = passwordEncoder.encode(nuevaContrasenia);
             usuario.setContrasenia(contraseniaEncriptada);
 
             usuario.setCreadoPor(usuarioSesion);
@@ -197,17 +198,26 @@ public class UsuarioControlador {
                     .orElseThrow(() -> new Exception("Rol no encontrado"));
             
             // Crear usuario en PostgreSQL con permisos según rol
-            jdbcTemplate.execute("CALL crear_usuario_db('" + usuario.getCorreo() + "', '" + usuario.getContrasenia() + "', '" + rol.getNombre() + "')");
+            jdbcTemplate.execute("CALL crear_usuario_db('" + usuario.getCorreo() + "', '" + contraseniaEncriptada + "', '" + rol.getNombre() + "')");
+
+            // Enviar correo con la contraseña
+            usuarioServicio.enviarCorreoRegistro(usuario.getCorreo(), nuevaContrasenia);
 
             redirectAttributes.addFlashAttribute("exito", true);
             return "redirect:/admin/gestion_usuarios_agregar";
 
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "Error al enviar el correo de registro: " + e.getMessage());
+            return "redirect:/admin/gestion_usuarios_agregar";
         } catch (Exception e) {
             e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "Error al guardar el usuario: " + e.getMessage());
             return "redirect:/admin/gestion_usuarios_agregar";
         }
     }
+
+    
 
     @GetMapping("/listar_usuarios")
     @ResponseBody
