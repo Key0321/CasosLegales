@@ -31,7 +31,14 @@ public class PermisoControlador {
     @GetMapping("/admin/gestion_permisos")
     public String listarPermisos(@RequestParam(defaultValue = "0") int pagina,
                                  @RequestParam(defaultValue = "10") int tamano,
-                                 Model model) {
+                                 Model model, 
+                                 HttpSession session) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
         Page<Permiso> paginaPermisos = permisoServicio.listarPaginados(pagina, tamano);
         model.addAttribute("permisos", paginaPermisos.getContent());
         model.addAttribute("paginaActual", pagina);

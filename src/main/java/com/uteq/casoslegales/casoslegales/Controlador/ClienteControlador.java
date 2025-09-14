@@ -40,7 +40,14 @@ public class ClienteControlador {
     @GetMapping("/admin/gestion_clientes")
     public String listarClientes(@RequestParam(defaultValue = "0") int pagina,
                                  @RequestParam(defaultValue = "10") int tamano,
-                                 Model model) {
+                                 Model model,
+                                 HttpSession session) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
         Page<Cliente> paginaClientes = clienteServicio.listarPaginados(pagina, tamano);
 
         model.addAttribute("clientes", paginaClientes.getContent());

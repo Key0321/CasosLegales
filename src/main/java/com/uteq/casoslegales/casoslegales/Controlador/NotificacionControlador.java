@@ -35,7 +35,14 @@ public class NotificacionControlador {
    @GetMapping("/admin/gestion_notificaciones")
     public String listarAbogados(@RequestParam(defaultValue = "0") int pagina,
                                  @RequestParam(defaultValue = "10") int tamano,
-                                 Model model) {
+                                 Model model,
+                                 HttpSession session) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
         Page<Notificacion> paginaAbogados = notificacionServicio.listarPaginados(pagina, tamano);
 
         model.addAttribute("notificaciones", paginaAbogados.getContent());
@@ -62,6 +69,12 @@ public class NotificacionControlador {
 
     @GetMapping({"/abogado/inicio_agregar_notificacion", "/admin/gestion_notificaciones_agregar"})
     public String mostrarFormularioNuevaNotificacion(HttpSession session, Model model) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
         Notificacion notificacion = new Notificacion();
         notificacion.setEnviadoCorreo(false); // Valor por defecto
         model.addAttribute("notificacion", notificacion);

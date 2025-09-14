@@ -44,7 +44,14 @@ public class DocumentoControlador {
     private ProcesoLegalServicio procesoServicio;
 
     @GetMapping("/admin/gestion_documentos_agregar")
-    public String mostrarFormularioDocumento(Model model) {
+    public String mostrarFormularioDocumento(Model model,
+                                 HttpSession session) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
         model.addAttribute("documento", new Documento());
         
         // Obtener procesos en formato mínimo [id, numeroProceso, nombreCliente]
@@ -167,7 +174,14 @@ public class DocumentoControlador {
     @GetMapping("/admin/gestion_documentos")
     public String listarDocumentos(@RequestParam(defaultValue = "0") int pagina,
                                    @RequestParam(defaultValue = "10") int tamano,
-                                   Model model) {
+                                   Model model, 
+                                 HttpSession session) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
         Page<Documento> paginaDocumentos = documentoServicio.listarPaginados(pagina, tamano);
 
         model.addAttribute("documentos", paginaDocumentos.getContent());

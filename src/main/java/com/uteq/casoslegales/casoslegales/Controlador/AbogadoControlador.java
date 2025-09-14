@@ -39,7 +39,14 @@ public class AbogadoControlador {
     @GetMapping("/admin/gestion_abogados")
     public String listarAbogados(@RequestParam(defaultValue = "0") int pagina,
                                  @RequestParam(defaultValue = "10") int tamano,
-                                 Model model) {
+                                 Model model,
+                                 HttpSession session) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
         Page<Abogado> paginaAbogados = abogadoServicio.listarPaginados(pagina, tamano);
 
         model.addAttribute("abogados", paginaAbogados.getContent());

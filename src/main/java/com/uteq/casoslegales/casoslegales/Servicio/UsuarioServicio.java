@@ -111,7 +111,8 @@ public class UsuarioServicio {
         usuarioRepo.deleteById(id);
     }
 
-   public Page<Usuario> listarPaginadosConFiltro(String busqueda, Long creadorId, int pagina, int tamano) {
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    public Page<Usuario> listarPaginadosConFiltro(String busqueda, Long creadorId, int pagina, int tamano) {
         Pageable pageable = PageRequest.of(pagina, tamano);
         
         if (busqueda != null && !busqueda.isEmpty()) {

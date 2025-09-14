@@ -147,6 +147,7 @@ public class DocumentoServicio {
         return "/documentos/" + nombreArchivo;
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Page<Documento> listarPaginadosConFiltrosPorUsuario(String busqueda, Long proceso, Integer anio, String tipo, List<Long> procesoIds, int pagina, int tamano) {
     Specification<Documento> spec = (root, query, cb) -> {
         List<Predicate> predicates = new ArrayList<>();
@@ -174,14 +175,17 @@ public class DocumentoServicio {
     return documentoRepo.findAll(spec, PageRequest.of(pagina, tamano));
 }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<ProcesoLegal> obtenerProcesosConDocumentosPorUsuario(List<Long> procesoIds) {
         return documentoRepo.findDistinctProcesosByProcesoIds(procesoIds);
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Integer> obtenerAniosDocumentosPorUsuario(List<Long> procesoIds) {
         return documentoRepo.findDistinctAniosByProcesoIds(procesoIds);
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<String> obtenerTiposDocumentosPorUsuario(List<Long> procesoIds) {
         return documentoRepo.findDistinctTiposByProcesoIds(procesoIds);
     }

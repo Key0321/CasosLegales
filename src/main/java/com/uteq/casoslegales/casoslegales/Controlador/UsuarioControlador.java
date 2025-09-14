@@ -56,7 +56,13 @@ public class UsuarioControlador {
     @GetMapping("/admin/gestion_usuarios")
     public String listarUsuarios(@RequestParam(defaultValue = "0") int pagina,
                                 @RequestParam(defaultValue = "10") int tamano,
-                                Model model) {
+                                Model model, 
+                                 HttpSession session) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
 
         Page<Usuario> paginaUsuarios = usuarioServicio.listarPaginados(pagina, tamano);
 
@@ -152,6 +158,10 @@ public class UsuarioControlador {
         model.addAttribute("roles", rolServicio.listarTodos());
 
         Usuario usuarioSesion = (Usuario) session.getAttribute("usuario");
+        if (usuarioSesion == null) {
+            return "redirect:/login";
+        }
+
         String uri = request.getRequestURI();
 
         if ("admin".equals(usuarioSesion.getRol().getNombre().toLowerCase())) {

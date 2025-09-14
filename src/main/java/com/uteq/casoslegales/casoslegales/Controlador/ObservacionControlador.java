@@ -27,7 +27,14 @@ public class ObservacionControlador {
     @GetMapping("/admin/gestion_observaciones")
     public String listarAbogados(@RequestParam(defaultValue = "0") int pagina,
                                  @RequestParam(defaultValue = "10") int tamano,
-                                 Model model) {
+                                 Model model, 
+                                 HttpSession session) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
         Page<Observacion> paginaAbogados = observacionServicio.listarPaginados(pagina, tamano);
 
         model.addAttribute("observaciones", paginaAbogados.getContent());
@@ -50,9 +57,7 @@ public class ObservacionControlador {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-    }
-
-    
+    } 
 
     @PostMapping("/admin/guardar_observacion")
     public String guardarPermiso(@ModelAttribute Observacion dato, HttpSession session) {

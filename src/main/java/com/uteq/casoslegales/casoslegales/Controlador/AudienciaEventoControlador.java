@@ -49,7 +49,14 @@ public class AudienciaEventoControlador {
     @GetMapping("/admin/gestion_eventos")
     public String listarAudienciasEventos(@RequestParam(defaultValue = "0") int pagina,
                                           @RequestParam(defaultValue = "10") int tamano,
-                                          Model model) {
+                                          Model model,
+                                          HttpSession session) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
         Page<AudienciaEvento> paginaAudiencias = audienciaServicio.listarPaginados(pagina, tamano);
 
         model.addAttribute("audiencias", paginaAudiencias.getContent());
@@ -60,7 +67,6 @@ public class AudienciaEventoControlador {
         return "admin/gestion_eventos";
     }
     
-
     @DeleteMapping("/eliminar_audiencia/{id}")
     public ResponseEntity<?> eliminarProceso(@PathVariable Long id) {
         try {

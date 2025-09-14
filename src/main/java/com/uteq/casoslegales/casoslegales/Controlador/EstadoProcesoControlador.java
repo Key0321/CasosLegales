@@ -1,7 +1,11 @@
 package com.uteq.casoslegales.casoslegales.Controlador;
 
 import com.uteq.casoslegales.casoslegales.Modelo.EstadoProceso;
+import com.uteq.casoslegales.casoslegales.Modelo.Usuario;
 import com.uteq.casoslegales.casoslegales.Servicio.EstadoProcesoServicio;
+
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -20,7 +24,14 @@ public class EstadoProcesoControlador {
     @GetMapping("/admin/gestion_estados")
     public String listarEstadosProcesos(@RequestParam(defaultValue = "0") int pagina,
                                         @RequestParam(defaultValue = "10") int tamano,
-                                        Model model) {
+                                        Model model,
+                                 HttpSession session) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
         Page<EstadoProceso> paginaEstados = estadoServicio.listarPaginados(pagina, tamano);
 
         model.addAttribute("estados", paginaEstados.getContent());
