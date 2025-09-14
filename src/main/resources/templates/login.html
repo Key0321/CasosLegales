@@ -5,18 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login</title>
 
-  <!-- Tailwind CSS -->
-
   <!-- Estilos personalizados -->
-  <link rel="stylesheet" th:href="@{/css/estilo_login.css}" />
+  <link rel="stylesheet" href="/css/estilo_login.css" />
 
   <link href="https://fonts.googleapis.com/css2?family=Domine:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:wght@100..900&display=swap" rel="stylesheet">
 
-  
+  <!-- Incluir Vue.js desde CDN -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <!-- Axios para peticiones HTTP -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
-  <div class="div-fondo">
+  <div class="div-fondo" id="app">
     <header id="encabezado">
       <div class="contenedor-navegacion">
         <div class="cn-lista-navegacion">
@@ -37,7 +38,7 @@
       </div>
     </header>
 
-   <!-- Inicio -->
+    <!-- Inicio -->
     <section style="margin-top:20px;">
         <div class="contenedor-2">
             <div class="contenedor-imagen">
@@ -49,33 +50,244 @@
                     <div class="dlc-contenido">
                         <h1>Hola !<br>Bienvenido de nuevo</h1>
 
-                        <form th:action="@{/login}" method="post">
+                        <!-- Formulario principal de login -->
+                        <div v-if="!mostrarVerificacion && !mostrarResetPassword && !mostrarNuevaContrasenia">
                           <div class="dlcc-input">
-                              <input type="email" name="correo" placeholder="Ingrese el correo electrónico" />
+                              <input type="email" v-model="correo" placeholder="Ingrese el correo electrónico" />
                           </div>
 
                           <div class="dlcc-input">
-                              <input type="password" name="contrasenia" placeholder="••••••••" />
+                              <input type="password" v-model="contrasenia" placeholder="••••••••" />
                           </div>
 
-                          <div th:if="${error}" style="color: red; text-align: center; margin: 10px 0;">
-                            <p th:text="${error}"></p>
+                          <div v-if="error" style="color: red; text-align: center; margin: 10px 0;">
+                            <p>{{ error }}</p>
                           </div>
                         
                           <div class="dlcc-contraseña">
-                              <a href="#">Olvidastes la contraseña?</a>
+                              <a href="#" @click.prevent="iniciarResetPassword">Olvidaste la contraseña?</a>
                           </div>
 
-                          <button class="dlcc-boton">Iniciar Sesión</button>
+                          <button class="dlcc-boton" @click.prevent="iniciarSesion" :disabled="cargandoLogin">
+                            {{ cargandoLogin ? 'Cargando...' : 'Iniciar Sesión' }}
+                          </button>
+                        </div>
 
-                        </form>
+                        <!-- Paso de verificación de código (tras credenciales válidas) -->
+                        <div v-if="mostrarVerificacion">
+                          <p>Se ha enviado un código de verificación a tu correo. Ingrésalo para continuar.</p>
+                          <div class="dlcc-input">
+                              <input type="text" v-model="codigoVerificacion" placeholder="Código de verificación" />
+                          </div>
+
+                          <div v-if="error" style="color: red; text-align: center; margin: 10px 0;">
+                            <p>{{ error }}</p>
+                          </div>
+
+                          <button class="dlcc-boton" @click.prevent="verificarCodigo">Verificar Código</button>
+                          <button class="dlcc-boton" style="background-color: #ccc; margin-top: 10px;" @click.prevent="volverInicio">Volver</button>
+                        </div>
+
+                        <!-- Paso de reset de contraseña (ingresar correo) -->
+                        <div v-if="mostrarResetPassword">
+                          <p>Ingresa tu correo para restablecer la contraseña.</p>
+                          <div class="dlcc-input">
+                              <input type="email" v-model="correoReset" placeholder="Ingrese el correo electrónico" />
+                          </div>
+
+                          <div v-if="error" style="color: red; text-align: center; margin: 10px 0;">
+                            <p>{{ error }}</p>
+                          </div>
+
+                          <button class="dlcc-boton" @click.prevent="enviarResetPassword" :disabled="cargandoReset || resetEnviado" :style="{ backgroundColor: resetEnviado ? '#28a745' : '' }">
+                            {{ cargandoReset ? 'Cargando...' : resetEnviado ? 'Enlace Enviado' : 'Enviar Enlace de Restablecimiento' }}
+                          </button>
+                          <button class="dlcc-boton" style="background-color: #ccc; margin-top: 10px;" @click.prevent="volverInicio">Volver</button>
+                        </div>
+
+                        <!-- Paso para ingresar nueva contraseña -->
+                        <div v-if="mostrarNuevaContrasenia">
+                          <p>Ingresa tu nueva contraseña y confírmala.</p>
+                          <div class="dlcc-input">
+                              <input type="password" v-model="nuevaContrasenia" placeholder="Nueva contraseña" />
+                          </div>
+                          <div class="dlcc-input">
+                              <input type="password" v-model="confirmarContrasenia" placeholder="Confirmar nueva contraseña" />
+                          </div>
+
+                          <div v-if="error" style="color: red; text-align: center; margin: 10px 0;">
+                            <p>{{ error }}</p>
+                          </div>
+
+                          <button class="dlcc-boton" @click.prevent="restablecerContrasenia" :disabled="cargandoReset">
+                            {{ cargandoReset ? 'Cargando...' : 'Restablecer Contraseña' }}
+                          </button>
+                          <button class="dlcc-boton" style="background-color: #ccc; margin-top: 10px;" @click.prevent="volverInicio">Volver</button>
+                        </div>
+
                     </div>
-            </div>
+                </div>
             </div>
         </div>
     </section>
   </div>
-  <!-- Header -->
-  
+
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          correo: '',
+          contrasenia: '',
+          codigoVerificacion: '',
+          mostrarVerificacion: false,
+          mostrarResetPassword: false,
+          mostrarNuevaContrasenia: false,
+          correoReset: '',
+          nuevaContrasenia: '',
+          confirmarContrasenia: '',
+          cargandoLogin: false,
+          cargandoReset: false,
+          resetEnviado: false,
+          token: '',
+          error: ''
+        };
+      },
+      mounted() {
+        // Verificar si hay un token en la URL para mostrar el paso de nueva contraseña
+        const urlParams = new URLSearchParams(window.location.search);
+        this.token = urlParams.get('token');
+        if (this.token) {
+          this.mostrarNuevaContrasenia = true;
+          this.mostrarVerificacion = false;
+          this.mostrarResetPassword = false;
+          // Obtener el correo asociado al token (opcional, si lo necesitas)
+          this.verificarToken();
+        }
+      },
+      methods: {
+        async iniciarSesion() {
+          this.error = '';
+          this.cargandoLogin = true;
+          try {
+            const response = await axios.post('/api/login/verificar-credenciales', {
+              correo: this.correo,
+              contrasenia: this.contrasenia
+            });
+            if (response.data.success) {
+              this.mostrarVerificacion = true;
+            } else {
+              this.error = response.data.message || 'Correo o contraseña incorrectos';
+            }
+          } catch (err) {
+            this.error = 'Error al procesar la solicitud';
+          } finally {
+            this.cargandoLogin = false;
+          }
+        },
+        async verificarCodigo() {
+          this.error = '';
+          try {
+            const response = await axios.post('/api/login/verificar-codigo', {
+              correo: this.correo,
+              codigo: this.codigoVerificacion
+            });
+            if (response.data.success) {
+              window.location.href = response.data.redirectUrl;
+            } else {
+              this.error = response.data.message || 'Código incorrecto';
+            }
+          } catch (err) {
+            this.error = 'Error al verificar el código';
+          }
+        },
+        iniciarResetPassword() {
+          this.mostrarResetPassword = true;
+          this.mostrarVerificacion = false;
+          this.mostrarNuevaContrasenia = false;
+          this.error = '';
+          this.correoReset = '';
+          this.resetEnviado = false;
+        },
+        async enviarResetPassword() {
+          this.error = '';
+          this.cargandoReset = true;
+          try {
+            const response = await axios.post('/api/login/reset-password', {
+              correo: this.correoReset
+            });
+            if (response.data.success) {
+              this.resetEnviado = true;
+              this.error = 'Se ha enviado un enlace de restablecimiento a tu correo.';
+            } else {
+              this.error = response.data.message || 'Correo no registrado';
+            }
+          } catch (err) {
+            this.error = 'Error al procesar la solicitud';
+          } finally {
+            this.cargandoReset = false;
+          }
+        },
+        async verificarToken() {
+          this.error = '';
+          try {
+            const response = await axios.get(`/api/login/verificar-token?token=${this.token}`);
+            if (response.data.success) {
+              this.correoReset = response.data.correo; // Guardar el correo asociado al token
+            } else {
+              this.error = 'Enlace inválido o expirado';
+              this.volverInicio();
+            }
+          } catch (err) {
+            this.error = 'Error al verificar el enlace';
+            this.volverInicio();
+          }
+        },
+        async restablecerContrasenia() {
+          this.error = '';
+          if (this.nuevaContrasenia !== this.confirmarContrasenia) {
+            this.error = 'Las contraseñas no coinciden';
+            return;
+          }
+          this.cargandoReset = true;
+          try {
+            const response = await axios.post('/api/login/confirm-reset', {
+              token: this.token,
+              nuevaContrasenia: this.nuevaContrasenia
+            });
+            if (response.data.success) {
+              this.error = 'Contraseña actualizada exitosamente';
+              this.volverInicio();
+            } else {
+              this.error = response.data.message || 'Error al restablecer la contraseña';
+            }
+          } catch (err) {
+            this.error = 'Error al procesar la solicitud';
+          } finally {
+            this.cargandoReset = false;
+          }
+        },
+        volverInicio() {
+          this.mostrarVerificacion = false;
+          this.mostrarResetPassword = false;
+          this.mostrarNuevaContrasenia = false;
+          this.correo = '';
+          this.contrasenia = '';
+          this.codigoVerificacion = '';
+          this.correoReset = '';
+          this.nuevaContrasenia = '';
+          this.confirmarContrasenia = '';
+          this.error = '';
+          this.resetEnviado = false;
+          this.cargandoLogin = false;
+          this.cargandoReset = false;
+          this.token = '';
+          // Limpiar el parámetro token de la URL
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      }
+    }).mount('#app');
+  </script>
 </body>
 </html>

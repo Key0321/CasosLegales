@@ -171,4 +171,20 @@ public class UsuarioServicio {
         }
     }
 
+    public Optional<Usuario> buscarPorCorreo(String correo) {
+        return usuarioRepo.findByCorreo(correo);
+    }
+
+    public void actualizarContrasenia(String correo, String nuevaContrasenia) {
+        Optional<Usuario> usuarioOpt = usuarioRepo.findByCorreo(correo);
+        if (usuarioOpt.isPresent()) {
+            Usuario usuario = usuarioOpt.get();
+            // Hashear la nueva contraseña antes de guardarla
+            usuario.setContrasenia(passwordEncoder.encode(nuevaContrasenia));
+            usuarioRepo.save(usuario);
+        } else {
+            throw new RuntimeException("Usuario no encontrado para el correo: " + correo);
+        }
+    }
+
 }
