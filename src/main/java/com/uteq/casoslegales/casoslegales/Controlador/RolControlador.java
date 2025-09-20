@@ -38,6 +38,7 @@ public class RolControlador {
         model.addAttribute("paginaActual", pagina);
         model.addAttribute("totalPaginas", paginaRoles.getTotalPages());
         model.addAttribute("totalElementos", paginaRoles.getTotalElements());
+        model.addAttribute("usuarioActual", usuario);
 
         return "admin/gestion_roles";
     }

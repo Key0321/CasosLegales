@@ -188,6 +188,7 @@ public class DocumentoControlador {
         model.addAttribute("paginaActual", pagina);
         model.addAttribute("totalPaginas", paginaDocumentos.getTotalPages());
         model.addAttribute("totalElementos", paginaDocumentos.getTotalElements());
+        model.addAttribute("usuarioActual", usuario);
 
         return "admin/gestion_documentos";
     }

@@ -9,25 +9,22 @@
 </head>
 <body>
   <div class="menu">
-      <div class="menu-logo">
-            <img src="../imagenes/logo.png" alt="Inicio" />
-        </div>
-        <div class="menu-item" style="background-color: #D4AF37;">
-            <img src="../imagenes/casos.png" alt="Calendar" />
-        </div>
-        <div class="menu-item">
-            <img src="../imagenes/calendario.png" alt="Calendar" />
-        </div>
-        <div class="menu-item">
-            <img src="../imagenes/documentos.png" alt="Activity" />
-        </div>
-        <div class="menu-item">
-            <img src="../imagenes/reporte.png" alt="Inicio" />
-        </div>
-        <div class="menu-item">
-            <img src="../imagenes/ajustes.png" alt="User" />
-        </div>
+    <div class="menu-logo">
+      <img th:src="@{/imagenes/logo.png}" alt="Inicio" />
     </div>
+    <div class="menu-item" th:onclick="|window.location.href='@{/abogado/inicio}'|">
+      <img th:src="@{/imagenes/casos.png}" alt="Mis casos" />
+    </div>
+    <div class="menu-item" th:onclick="|window.location.href='@{/abogado/calendario}'|">
+      <img th:src="@{/imagenes/calendario.png}" alt="Calendar" />
+    </div>
+    <div class="menu-item activo" th:onclick="|window.location.href='@{/abogado/documentos}'|">
+      <img th:src="@{/imagenes/documentos.png}" alt="Documentos" />
+    </div>
+    <div class="menu-item" th:onclick="|window.location.href='@{/abogado/usuarios}'|">
+      <img th:src="@{/imagenes/admin_usuario.png}" alt="Clientes" />
+    </div>
+  </div>
 
     
 

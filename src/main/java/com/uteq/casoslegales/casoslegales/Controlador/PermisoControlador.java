@@ -44,6 +44,7 @@ public class PermisoControlador {
         model.addAttribute("paginaActual", pagina);
         model.addAttribute("totalPaginas", paginaPermisos.getTotalPages());
         model.addAttribute("totalElementos", paginaPermisos.getTotalElements());
+        model.addAttribute("usuarioActual", usuario);
 
         return "admin/gestion_permisos";
     }

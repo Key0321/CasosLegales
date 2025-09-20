@@ -75,3 +75,64 @@ body {
   padding: 2rem;
   background-color: var(--color-fondo);
 }
+
+/* Menú desplegable de perfil */
+.menu-perfil {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    width: 280px;
+    background-color: var(--color-blanco);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 1rem;
+    z-index: 1000;
+    display: none;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.menu-perfil.mostrar {
+    display: flex;
+}
+
+.perfil-info {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-borde);
+}
+
+.perfil-nombre {
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--color-texto);
+    margin-bottom: 4px;
+}
+
+.perfil-email {
+    font-size: 14px;
+    color: var(--color-texto-secundario);
+}
+
+.btn-cerrar-sesion {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    color: var(--color-texto);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-cerrar-sesion:hover {
+    background-color: var(--color-hover);
+}
+
+.btn-cerrar-sesion img {
+    width: 18px;
+    height: 18px;
+}

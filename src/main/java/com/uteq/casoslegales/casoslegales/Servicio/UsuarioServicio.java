@@ -142,8 +142,8 @@ public class UsuarioServicio {
     }
 
     public void enviarCorreoRegistro(String correoDestino, String contrasenia) throws MessagingException {
-        String remitente = "kbedonv@uteq.edu.ec"; // Reemplaza con tu correo
-        String contraseniaRemitente = "gxvm oryp sexd nfqc"; // Reemplaza con tu contraseña de aplicación
+        String remitente = "kbedonv@uteq.edu.ec"; 
+        String contraseniaRemitente = "gxvm oryp sexd nfqc"; 
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");

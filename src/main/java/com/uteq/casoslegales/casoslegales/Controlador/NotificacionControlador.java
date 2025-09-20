@@ -49,6 +49,7 @@ public class NotificacionControlador {
         model.addAttribute("paginaActual", pagina);
         model.addAttribute("totalPaginas", paginaAbogados.getTotalPages());
         model.addAttribute("totalElementos", paginaAbogados.getTotalElements());
+        model.addAttribute("usuarioActual", usuario);
 
         return "admin/gestion_notificaciones";
     }

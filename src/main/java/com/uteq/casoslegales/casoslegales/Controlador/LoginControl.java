@@ -45,10 +45,8 @@ public class LoginControl {
     @Autowired
     private AccesoServicio accesoService;
 
-    // Mapa temporal para tokens de verificación (correo -> código)
     private Map<String, String> codigosVerificacion = new ConcurrentHashMap<>();
 
-    // Mapa temporal para tokens de reset (correo -> token)
     private Map<String, String> tokensReset = new ConcurrentHashMap<>();
 
     @GetMapping("/login")

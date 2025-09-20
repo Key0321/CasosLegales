@@ -86,6 +86,7 @@ public class ProcesoLegalControlador {
         model.addAttribute("paginaActual", pagina);
         model.addAttribute("totalPaginas", paginaProcesos.getTotalPages());
         model.addAttribute("totalElementos", paginaProcesos.getTotalElements());
+        model.addAttribute("usuarioActual", usuario);
         return "admin/gestion_procesos_legales";
     }
 
@@ -119,6 +120,7 @@ public class ProcesoLegalControlador {
         }
         List<ProcesoLegal> procesos = procesoServicio.listarPorUsuario(usuario.getId());
         model.addAttribute("procesos", procesos);
+        model.addAttribute("usuarioActual", usuario);
         // Devolver la vista correspondiente según el rol
         return "abogado".equalsIgnoreCase(usuario.getRol().getNombre()) ? 
                "abogado/inicio" : "cliente/inicio";

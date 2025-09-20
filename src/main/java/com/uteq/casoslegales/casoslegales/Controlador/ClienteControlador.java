@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,6 +38,9 @@ public class ClienteControlador {
     @Autowired
     private RolServicio rolServicio;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @GetMapping("/admin/gestion_clientes")
     public String listarClientes(@RequestParam(defaultValue = "0") int pagina,
                                  @RequestParam(defaultValue = "10") int tamano,
@@ -54,6 +58,7 @@ public class ClienteControlador {
         model.addAttribute("paginaActual", pagina);
         model.addAttribute("totalPaginas", paginaClientes.getTotalPages());
         model.addAttribute("totalElementos", paginaClientes.getTotalElements());
+        model.addAttribute("usuarioActual", usuario);
 
         return "admin/gestion_clientes";
     }
@@ -100,6 +105,11 @@ public class ClienteControlador {
             usuario.setRol(rolCliente);
 
             usuario = usuarioServicio.guardar(usuario);
+
+            Rol rol = rolServicio.obtenerPorId(usuario.getRol().getId())
+                    .orElseThrow(() -> new Exception("Rol no encontrado"));
+            
+            jdbcTemplate.execute("CALL crear_usuario_db('" + usuario.getCorreo() + "', '" + contraseniaEncriptada + "', '" + rol.getNombre() + "')");
 
             Cliente cliente = new Cliente();
             cliente.setDireccion(direccion);

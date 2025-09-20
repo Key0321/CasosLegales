@@ -13,11 +13,6 @@
           <img src="../imagenes/logo.png" alt="Logo" />
       </div>
 
-      <div class="menu-item" th:onclick="|window.location.href='@{/admin/inicio}'|">
-          <img src="../imagenes/admin_inicio.png" alt="Inicio" />
-          <span>Inicio</span>
-      </div>
-
       <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_procesos_legales}'|">
           <img src="../imagenes/casos.png" alt="Procesos Legales" />
           <span>Procesos Legales</span>
@@ -77,11 +72,6 @@
           <img src="../imagenes/admin_comunicacion.png" alt="Chats" />
           <span>Chats</span>
       </div>
-
-      <div class="menu-item" th:onclick="|window.location.href='@{/admin/gestion_ajustes}'|">
-          <img src="../imagenes/ajustes.png" alt="Ajustes" />
-          <span>Ajustes</span>
-      </div>
   </div>
 
     <div class="encabezado">
@@ -100,9 +90,26 @@
             <img src="../imagenes/notificaciones.png" alt="Notificacion" />
         </div>
         <div class="menu-item item-perfil">
-            K
-        </div>
+                <span th:text="${#strings.substring(usuarioActual.nombre, 0, 1) + #strings.substring(usuarioActual.apellido, 0, 1)}">US</span>
+          </div>
       </div>
+
+      <div class="menu-perfil" id="menuPerfil">
+            <div class="perfil-info">
+                <div class="perfil-nombre" th:text="${usuarioActual.nombre + ' ' + usuarioActual.apellido}">
+                    Nombre Apellido
+                </div>
+                <div class="perfil-email" th:text="${usuarioActual.correo}">
+                    usuario@ejemplo.com
+                </div>
+            </div>
+            <div class="perfil-acciones">
+                <button class="btn-cerrar-sesion" onclick="cerrarSesion()">
+                    <img th:src="@{/imagenes/cerrar-sesion.png}" alt="Cerrar sesión" />
+                    Cerrar sesión
+                </button>
+            </div>
+        </div>
     </div>
 
     <div class="div-contenido">
@@ -233,6 +240,52 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
+</script>
+
+<script th:inline="javascript">
+    // Mostrar/ocultar menú de perfil
+    document.querySelector('.item-perfil').addEventListener('click', function(e) {
+        e.stopPropagation();
+        const menu = document.getElementById('menuPerfil');
+        menu.classList.toggle('mostrar');
+    });
+
+    // Ocultar menú al hacer clic fuera
+    document.addEventListener('click', function(e) {
+        const menu = document.getElementById('menuPerfil');
+        const perfilBtn = document.querySelector('.item-perfil');
+        
+        if (!menu.contains(e.target) && !perfilBtn.contains(e.target)) {
+            menu.classList.remove('mostrar');
+        }
+    });
+
+    function cerrarSesion() {
+        const usuarioId = /*[[${usuarioActual.id}]]*/ null;
+        
+        if (usuarioId) {
+            fetch('/cerrar_sesion_usuario/' + usuarioId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/login';
+                } else {
+                    console.error('Error al cerrar sesión');
+                    window.location.href = '/login';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                window.location.href = '/login';
+            });
+        } else {
+            window.location.href = '/login';
+        }
+    }
 </script>
 
     </div>

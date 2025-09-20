@@ -79,6 +79,7 @@ public class UsuarioControlador {
         model.addAttribute("paginaActual", pagina);
         model.addAttribute("totalPaginas", paginaUsuarios.getTotalPages());
         model.addAttribute("totalElementos", paginaUsuarios.getTotalElements());
+        model.addAttribute("usuarioActual", usuario);
 
         return "admin/gestion_usuarios";
     }
@@ -203,14 +204,11 @@ public class UsuarioControlador {
 
             usuario = usuarioServicio.guardar(usuario);
 
-            // Obtener nombre del rol para asignar permisos en BD
             Rol rol = rolServicio.obtenerPorId(usuario.getRol().getId())
                     .orElseThrow(() -> new Exception("Rol no encontrado"));
             
-            // Crear usuario en PostgreSQL con permisos según rol
             jdbcTemplate.execute("CALL crear_usuario_db('" + usuario.getCorreo() + "', '" + contraseniaEncriptada + "', '" + rol.getNombre() + "')");
 
-            // Enviar correo con la contraseña
             usuarioServicio.enviarCorreoRegistro(usuario.getCorreo(), nuevaContrasenia);
 
             redirectAttributes.addFlashAttribute("exito", true);

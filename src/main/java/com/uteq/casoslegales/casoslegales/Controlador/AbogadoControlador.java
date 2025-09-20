@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,6 +37,9 @@ public class AbogadoControlador {
     @Autowired
     private RolServicio rolServicio;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @GetMapping("/admin/gestion_abogados")
     public String listarAbogados(@RequestParam(defaultValue = "0") int pagina,
                                  @RequestParam(defaultValue = "10") int tamano,
@@ -53,6 +57,7 @@ public class AbogadoControlador {
         model.addAttribute("paginaActual", pagina);
         model.addAttribute("totalPaginas", paginaAbogados.getTotalPages());
         model.addAttribute("totalElementos", paginaAbogados.getTotalElements());
+        model.addAttribute("usuarioActual", usuario);
 
         return "admin/gestion_abogados";
     }
@@ -99,6 +104,11 @@ public class AbogadoControlador {
             usuario.setRol(rolCliente);
 
             usuario = usuarioServicio.guardar(usuario);
+
+            Rol rol = rolServicio.obtenerPorId(usuario.getRol().getId())
+                    .orElseThrow(() -> new Exception("Rol no encontrado"));
+            
+            jdbcTemplate.execute("CALL crear_usuario_db('" + usuario.getCorreo() + "', '" + contraseniaEncriptada + "', '" + rol.getNombre() + "')");
 
             Abogado abogado = new Abogado();
             abogado.setEspecialidad(especialidad);

@@ -63,6 +63,7 @@ public class AudienciaEventoControlador {
         model.addAttribute("paginaActual", pagina);
         model.addAttribute("totalPaginas", paginaAudiencias.getTotalPages());
         model.addAttribute("totalElementos", paginaAudiencias.getTotalElements());
+        model.addAttribute("usuarioActual", usuario);
 
         return "admin/gestion_eventos";
     }

@@ -234,7 +234,7 @@
           try {
             const response = await axios.get(`/api/login/verificar-token?token=${this.token}`);
             if (response.data.success) {
-              this.correoReset = response.data.correo; // Guardar el correo asociado al token
+              this.correoReset = response.data.correo; 
             } else {
               this.error = 'Enlace inválido o expirado';
               this.volverInicio();

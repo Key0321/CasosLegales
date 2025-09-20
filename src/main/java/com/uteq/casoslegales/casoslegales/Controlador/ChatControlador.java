@@ -25,13 +25,21 @@ public class ChatControlador {
     @GetMapping("/admin/gestion_chats")
     public String listarChats(@RequestParam(defaultValue = "0") int pagina,
                               @RequestParam(defaultValue = "10") int tamano,
-                              Model model) {
+                              Model model,
+                              HttpSession session) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
         Page<Chat> paginaChats = chatServicio.listarPaginados(pagina, tamano);
 
         model.addAttribute("chats", paginaChats.getContent());
         model.addAttribute("paginaActual", pagina);
         model.addAttribute("totalPaginas", paginaChats.getTotalPages());
         model.addAttribute("totalElementos", paginaChats.getTotalElements());
+        model.addAttribute("usuarioActual", usuario);
 
         return "admin/gestion_chats";
     }

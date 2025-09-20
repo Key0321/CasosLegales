@@ -38,6 +38,7 @@ public class EstadoProcesoControlador {
         model.addAttribute("paginaActual", pagina);
         model.addAttribute("totalPaginas", paginaEstados.getTotalPages());
         model.addAttribute("totalElementos", paginaEstados.getTotalElements());
+        model.addAttribute("usuarioActual", usuario);
 
         return "admin/gestion_estados";
     }
